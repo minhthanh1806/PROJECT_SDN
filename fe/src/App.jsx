@@ -1,24 +1,51 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider } from './context/ThemeContext';
+import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
-import HomePage from './pages/HomePage';
-import CardDetailPage from './pages/CardDetailPage';
+import SearchBar from './components/SearchBar';
+import CardGrid from './components/CardGrid';
+import { getCards } from './services/api';
 
 export default function App() {
+  const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const fetchCards = async (query) => {
+    setLoading(true);
+    try {
+      const params = { limit: 30 };
+      if (query && query.trim() !== '') {
+        params.fname = query.trim();
+      }
+      const res = await getCards(params);
+      if (res.data?.success) {
+        setCards(res.data.data);
+      }
+    } catch (err) {
+      console.error('Error fetching cards:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCards(searchTerm);
+  }, [searchTerm]);
+
   return (
-    <ThemeProvider>
-      <Router>
-        <div className="app-shell">
-          <Navbar />
-          <main className="main-viewport">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/card/:id" element={<CardDetailPage />} />
-            </Routes>
-          </main>
+    <div className="app-shell">
+      {/* Header */}
+      <Navbar />
+
+      {/* Main Content */}
+      <main className="container" style={{ padding: '2rem 1.25rem 3rem' }}>
+        {/* Ô tìm kiếm */}
+        <div style={{ maxWidth: '640px', margin: '0 auto 2rem' }}>
+          <SearchBar value={searchTerm} onChange={setSearchTerm} />
         </div>
-      </Router>
-    </ThemeProvider>
+
+        {/* Danh sách thẻ bài */}
+        <CardGrid cards={cards} loading={loading} />
+      </main>
+    </div>
   );
 }

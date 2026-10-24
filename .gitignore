@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+be/node_modules/
+fe/node_modules/
+
+# Build
+dist/
+fe/dist/
+
+# Environment files
+# .env
+
+# Cached images
+be/public/images/cards/*.jpg
+
+# Logs
+*.log
+npm-debug.log*
