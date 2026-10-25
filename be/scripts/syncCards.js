@@ -175,8 +175,10 @@ async function syncCardData(options = { downloadImages: false, imageLimit: 100 }
   } catch (error) {
     console.error('[Sync Error]', error.message);
   } finally {
-    await mongoose.connection.close();
-    console.log('[Sync] Đóng kết nối MongoDB.');
+    if (require.main === module) {
+      await mongoose.connection.close();
+      console.log('[Sync] Đóng kết nối MongoDB.');
+    }
   }
 }
 

@@ -32,8 +32,8 @@ exports.getCards = async (req, res) => {
     }
 
     // 2. Bộ lọc
-    if (type) {
-      query.type = { $regex: type, $options: 'i' };
+    if (type && type.trim() !== '') {
+      query.type = type.trim();
     }
     if (attribute) {
       query.attribute = attribute;

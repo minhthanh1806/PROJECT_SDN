@@ -37,7 +37,7 @@ export default function CardItem({ card }) {
         
         {/* Type & Attribute */}
         <div className="card-tags">
-          <span className="card-type-tag">{card.race || card.type}</span>
+          <span className="card-type-tag">{card.type}</span>
           {card.attribute && (
             <span className={`card-attr-tag attr-${card.attribute.toLowerCase()}`}>
               {card.attribute}
