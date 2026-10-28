@@ -5,7 +5,10 @@ import CardFilter from './components/CardFilter';
 import LevelFilter from './components/LevelFilter';
 import CardSort from './components/CardSort';
 import CardGrid from './components/CardGrid';
+import Pagination from './components/Pagination';
 import { getCards } from './services/api';
+
+const CARDS_PER_PAGE = 10; // Mỗi trang hiển thị 10 thẻ (40 thẻ chia thành 4 trang)
 
 export default function App() {
   const [initialCards, setInitialCards] = useState([]);
@@ -14,6 +17,7 @@ export default function App() {
   const [selectedType, setSelectedType] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('');
   const [sortBy, setSortBy] = useState('name');
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Tải danh sách 40 thẻ ban đầu từ server
   useEffect(() => {
@@ -46,8 +50,8 @@ export default function App() {
     ).sort((a, b) => a - b);
   }, [initialCards]);
 
-  // Lọc và sắp xếp trực tiếp từ 40 thẻ
-  const displayedCards = useMemo(() => {
+  // Lọc và sắp xếp trực tiếp từ 40 thẻ hiện tại
+  const filteredAndSortedCards = useMemo(() => {
     return initialCards
       .filter((card) => {
         const matchesSearch =
@@ -70,6 +74,41 @@ export default function App() {
       });
   }, [initialCards, searchTerm, selectedType, selectedLevel, sortBy]);
 
+  // Tính toán tổng số trang dựa trên số lượng card hiện tại
+  const totalPages = Math.ceil(filteredAndSortedCards.length / CARDS_PER_PAGE) || 1;
+
+  // Lấy danh sách thẻ bài của đúng trang hiện tại
+  const paginatedCards = useMemo(() => {
+    const start = (currentPage - 1) * CARDS_PER_PAGE;
+    return filteredAndSortedCards.slice(start, start + CARDS_PER_PAGE);
+  }, [filteredAndSortedCards, currentPage]);
+
+  // Tự động quay về trang 1 khi tìm kiếm, đổi lọc hoặc đổi sắp xếp
+  const handleSearchChange = (term) => {
+    setSearchTerm(term);
+    setCurrentPage(1);
+  };
+
+  const handleTypeChange = (type) => {
+    setSelectedType(type);
+    setCurrentPage(1);
+  };
+
+  const handleLevelChange = (level) => {
+    setSelectedLevel(level);
+    setCurrentPage(1);
+  };
+
+  const handleSortChange = (sort) => {
+    setSortBy(sort);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="app-shell">
       {/* Header */}
@@ -81,7 +120,7 @@ export default function App() {
         <div
           style={{
             maxWidth: '1000px',
-            margin: '0 auto 2rem',
+            margin: '0 auto 1.5rem',
             display: 'flex',
             gap: '0.75rem',
             flexWrap: 'wrap',
@@ -89,29 +128,58 @@ export default function App() {
           }}
         >
           <div style={{ flex: '1', minWidth: '240px' }}>
-            <SearchBar value={searchTerm} onChange={setSearchTerm} />
+            <SearchBar value={searchTerm} onChange={handleSearchChange} />
           </div>
           <div style={{ width: '190px', minWidth: '150px' }}>
             <CardFilter
               types={availableTypes}
               selectedType={selectedType}
-              onTypeChange={setSelectedType}
+              onTypeChange={handleTypeChange}
             />
           </div>
           <div style={{ width: '170px', minWidth: '140px' }}>
             <LevelFilter
               levels={availableLevels}
               selectedLevel={selectedLevel}
-              onLevelChange={setSelectedLevel}
+              onLevelChange={handleLevelChange}
             />
           </div>
           <div style={{ width: '180px', minWidth: '150px' }}>
-            <CardSort sortBy={sortBy} onSortChange={setSortBy} />
+            <CardSort sortBy={sortBy} onSortChange={handleSortChange} />
           </div>
         </div>
 
-        {/* Danh sách thẻ bài hiển thị */}
-        <CardGrid cards={displayedCards} loading={loading} />
+        {/* Thông tin số lượng thẻ & trang hiện tại */}
+        <div
+          style={{
+            maxWidth: '1000px',
+            margin: '0 auto 1.25rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            fontSize: '0.9rem',
+            color: '#64748b',
+          }}
+        >
+          <span>
+            Đang hiển thị: <strong>{paginatedCards.length}</strong> / <strong>{filteredAndSortedCards.length}</strong> lá bài
+          </span>
+          <span>
+            Trang <strong>{currentPage}</strong> / {totalPages} ({CARDS_PER_PAGE} thẻ/trang)
+          </span>
+        </div>
+
+        {/* Danh sách thẻ bài của trang hiện tại */}
+        <CardGrid cards={paginatedCards} loading={loading} />
+
+        {/* Thanh phân trang (chỉ tính trên số lượng card hiện tại) */}
+        <div style={{ marginTop: '2.5rem' }}>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
       </main>
     </div>
   );
