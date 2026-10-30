@@ -124,6 +124,93 @@ a {
   gap: 0.5rem;
 }
 
+.nav-header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.95rem;
+  border-radius: 8px;
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.nav-header-btn:hover {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.nav-header-btn.active {
+  background-color: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.banlist-nav-btn {
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.banlist-nav-btn:hover {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #fee2e2;
+}
+
+.banlist-nav-btn.active {
+  background-color: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
+}
+
+/* Banlist Page Tabs */
+.ban-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.15rem;
+  border-radius: 8px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ban-tab-btn:hover {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.ban-tab-btn.active {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: #ffffff;
+}
+
+.ban-tab-btn.tab-forbidden.active {
+  background-color: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
+}
+
+.ban-tab-btn.tab-limited.active {
+  background-color: #d97706;
+  border-color: #d97706;
+  color: #ffffff;
+}
+
+.ban-tab-btn.tab-semi.active {
+  background-color: #ca8a04;
+  border-color: #ca8a04;
+  color: #ffffff;
+}
+
 .action-btn {
   display: inline-flex;
   align-items: center;

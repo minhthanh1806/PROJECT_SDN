@@ -51,7 +51,12 @@ exports.getCards = async (req, res) => {
       query['card_sets.set_code'] = { $regex: cardset, $options: 'i' };
     }
     if (banlist) {
-      query['banlist_info.ban_tcg'] = banlist;
+      if (banlist === 'Banned') {
+        // Lấy tất cả các thẻ bị cấm hoặc giới hạn (Forbidden, Limited, Semi-Limited)
+        query['banlist_info.ban_tcg'] = { $in: ['Forbidden', 'Limited', 'Semi-Limited'] };
+      } else {
+        query['banlist_info.ban_tcg'] = banlist;
+      }
     }
 
     // ATK / DEF range
@@ -147,6 +152,52 @@ exports.getCardById = async (req, res) => {
     });
   } catch (error) {
     console.error('[getCardById error]', error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Lấy toàn bộ danh sách các lá bài thuộc Banlist (155 Forbidden + 91 Limited + 7 Semi-Limited = 253 lá)
+// Hỗ trợ gom nhóm (grouped = true) hoặc trả về phẳng
+exports.getSampleBannedCards = async (req, res) => {
+  try {
+    const { format } = req.query; // format=grouped hoặc phẳng
+
+    if (format === 'grouped') {
+      const [forbidden, limited, semiLimited] = await Promise.all([
+        Card.find({ 'banlist_info.ban_tcg': 'Forbidden' }).sort({ name: 1 }).lean(),
+        Card.find({ 'banlist_info.ban_tcg': 'Limited' }).sort({ name: 1 }).lean(),
+        Card.find({ 'banlist_info.ban_tcg': 'Semi-Limited' }).sort({ name: 1 }).lean()
+      ]);
+
+      return res.json({
+        success: true,
+        data: {
+          forbidden,
+          limited,
+          semiLimited,
+          stats: {
+            forbiddenCount: forbidden.length,
+            limitedCount: limited.length,
+            semiLimitedCount: semiLimited.length,
+            totalCount: forbidden.length + limited.length + semiLimited.length
+          }
+        }
+      });
+    }
+
+    const cards = await Card.find({
+      'banlist_info.ban_tcg': { $in: ['Forbidden', 'Limited', 'Semi-Limited'] }
+    })
+      .sort({ name: 1 })
+      .lean();
+
+    return res.json({
+      success: true,
+      data: cards,
+      totalCount: cards.length
+    });
+  } catch (error) {
+    console.error('[getSampleBannedCards error]', error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
