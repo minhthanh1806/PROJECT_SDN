@@ -166,6 +166,111 @@ a {
   color: #ffffff;
 }
 
+button.nav-header-btn {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.nav-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.nav-user strong {
+  color: var(--text-primary);
+}
+
+/* Auth (Login / Register) */
+.auth-card {
+  max-width: 380px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0 0 1.25rem;
+  text-align: center;
+}
+
+.auth-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.auth-input {
+  padding: 0.7rem 0.85rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.auth-input:focus {
+  border-color: var(--primary);
+}
+
+.auth-error,
+.auth-success {
+  font-size: 0.85rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.auth-error {
+  background-color: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.auth-success {
+  background-color: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+
+.auth-submit {
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--primary);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-switch {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.auth-switch a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
 /* Banlist Page Tabs */
 .ban-tab-btn {
   display: inline-flex;

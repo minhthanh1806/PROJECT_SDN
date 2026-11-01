@@ -10,4 +10,8 @@ export const getCardById = (id) => API.get(`/cards/${id}`);
 export const getFilterOptions = () => API.get('/cards/meta/filters');
 export const getCardsBySet = (setCode) => API.get(`/cards/set/${setCode}`);
 
+// Auth
+export const registerUser = (data) => API.post('/auth/register', data);
+export const loginUser = (data) => API.post('/auth/login', data);
+
 export default API;
