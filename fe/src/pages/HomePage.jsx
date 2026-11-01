@@ -126,34 +126,25 @@ export default function HomePage() {
       {/* Main Content */}
       <main className="container" style={{ padding: '2rem 1.25rem 3rem' }}>
         {/* Thanh điều khiển: Tìm kiếm + Lọc loại thẻ + Lọc cấp sao + Sắp xếp giá */}
-        <div
-          style={{
-            maxWidth: '1000px',
-            margin: '0 auto 1.5rem',
-            display: 'flex',
-            gap: '0.75rem',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-          }}
-        >
-          <div style={{ flex: '1', minWidth: '240px' }}>
+        <div className="home-control-bar">
+          <div className="control-search">
             <SearchBar value={searchTerm} onChange={handleSearchChange} />
           </div>
-          <div style={{ width: '190px', minWidth: '150px' }}>
+          <div className="control-filter">
             <CardFilter
               types={availableTypes}
               selectedType={selectedType}
               onTypeChange={handleTypeChange}
             />
           </div>
-          <div style={{ width: '170px', minWidth: '140px' }}>
+          <div className="control-filter">
             <LevelFilter
               levels={availableLevels}
               selectedLevel={selectedLevel}
               onLevelChange={handleLevelChange}
             />
           </div>
-          <div style={{ width: '180px', minWidth: '150px' }}>
+          <div className="control-filter">
             <CardSort sortBy={sortBy} onSortChange={handleSortChange} />
           </div>
         </div>
