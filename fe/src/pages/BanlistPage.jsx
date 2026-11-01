@@ -80,49 +80,21 @@ export default function BanlistPage() {
       <Navbar />
 
       <main className="container" style={{ padding: '2rem 1.25rem 3rem' }}>
-        {/* Thanh tiêu đề và nút quay lại */}
+        {/* Thanh tiêu đề */}
         <div
           style={{
             maxWidth: '1000px',
             margin: '0 auto 1.5rem',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '1rem',
           }}
         >
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-              <ShieldAlert size={26} color="#ef4444" />
-              <h1 style={{ fontSize: '1.6rem', fontWeight: 700, margin: 0 }}>
-                Danh Sách Thẻ Bài Bị Cấm & Giới Hạn (Banlist)
-              </h1>
-            </div>
+            <h1 style={{ fontSize: '1.6rem', fontWeight: 700, margin: '0 0 0.25rem' }}>
+              Danh Sách Thẻ Bài Bị Cấm & Giới Hạn (Banlist)
+            </h1>
             <p style={{ color: '#94a3b8', margin: 0, fontSize: '0.9rem' }}>
               Cập nhật quy định thi đấu TCG mới nhất với tổng cộng <strong>{data.stats.totalCount}</strong> lá bài
             </p>
           </div>
-
-          <Link
-            to="/"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              padding: '0.55rem 1rem',
-              borderRadius: '8px',
-              backgroundColor: '#1e293b',
-              color: '#f8fafc',
-              textDecoration: 'none',
-              fontSize: '0.9rem',
-              fontWeight: 500,
-              border: '1px solid #334155',
-              transition: 'background-color 0.15s',
-            }}
-          >
-            <ArrowLeft size={16} /> Quay lại trang chủ
-          </Link>
         </div>
 
         {/* Các tab chuyển đổi nhanh: Tất cả / Cấm / Hạn chế 1 / Hạn chế 2 */}

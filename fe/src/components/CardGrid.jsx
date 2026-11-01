@@ -1,7 +1,7 @@
 import React from 'react';
 import CardItem from './CardItem';
 
-export default function CardGrid({ cards, loading }) {
+export default function CardGrid({ cards, loading, onFavoriteChange }) {
   if (loading) {
     return (
       <div className="loading-container">
@@ -24,7 +24,7 @@ export default function CardGrid({ cards, loading }) {
   return (
     <div className="card-grid">
       {cards.map((card) => (
-        <CardItem key={card.id} card={card} />
+        <CardItem key={card.id} card={card} onFavoriteChange={onFavoriteChange} />
       ))}
     </div>
   );

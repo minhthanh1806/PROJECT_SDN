@@ -10,8 +10,11 @@ export const getCardById = (id) => API.get(`/cards/${id}`);
 export const getFilterOptions = () => API.get('/cards/meta/filters');
 export const getCardsBySet = (setCode) => API.get(`/cards/set/${setCode}`);
 
-// Auth
+// Auth & User Profile
 export const registerUser = (data) => API.post('/auth/register', data);
 export const loginUser = (data) => API.post('/auth/login', data);
+export const getUserProfile = (userId) => API.get(`/auth/profile/${userId}`);
+export const changePassword = (userId, data) => API.put(`/auth/change-password/${userId}`, data);
+export const toggleFavoriteCard = (userId, cardId) => API.post(`/auth/favorite/${userId}`, { cardId });
 
 export default API;

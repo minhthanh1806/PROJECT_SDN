@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true, trim: true },
-  password: { type: String, required: true } // Lưu dạng đã mã hoá: salt:hash
+  password: { type: String, required: true }, // Lưu dạng đã mã hoá: salt:hash
+  favorites: [{ type: Number }] // Danh sách các card id được lưu vào bộ sưu tập
 }, {
   timestamps: true
 });

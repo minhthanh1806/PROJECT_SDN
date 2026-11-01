@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import { toggleFavoriteCard } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -23,8 +24,33 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  // Toggle favorite một thẻ bài
+  const toggleFavorite = async (cardId) => {
+    if (!user || !user.id) return { success: false, needLogin: true };
+    try {
+      const res = await toggleFavoriteCard(user.id, cardId);
+      if (res.data?.success) {
+        const updatedFavorites = res.data.favorites;
+        const updatedUser = { ...user, favorites: updatedFavorites };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+        return { success: true, isFavorited: res.data.isFavorited };
+      }
+    } catch (err) {
+      console.error('Error toggle favorite:', err);
+      return { success: false, message: err.message };
+    }
+    return { success: false };
+  };
+
+  // Kiểm tra một cardId có trong favorites của user không
+  const isCardFavorited = (cardId) => {
+    if (!user || !user.favorites) return false;
+    return user.favorites.includes(Number(cardId));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, toggleFavorite, isCardFavorited }}>
       {children}
     </AuthContext.Provider>
   );

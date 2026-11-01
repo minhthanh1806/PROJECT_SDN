@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ShieldAlert, Home, LogIn, LogOut, User } from 'lucide-react';
+import { ShieldAlert, Home, LogIn, LogOut, User, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
@@ -9,6 +9,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const isBanlist = location.pathname === '/banlist';
   const isHome = location.pathname === '/';
+  const isProfile = location.pathname === '/profile';
 
   const handleLogout = () => {
     logout();
@@ -32,7 +33,7 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Nút điều hướng giữa Trang Chủ, Trang Banlist và Đăng nhập / Đăng xuất */}
+        {/* Nút điều hướng giữa Trang Chủ, Banlist và Trang cá nhân */}
         <nav style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <Link
             to="/"
@@ -49,10 +50,26 @@ export default function Navbar() {
 
           {user ? (
             <>
-              <span className="nav-user">
-                <User size={16} /> Xin chào, <strong>{user.username}</strong>
-              </span>
-              <button className="nav-header-btn" onClick={handleLogout} type="button">
+              <Link
+                to="/profile"
+                className={`nav-header-btn ${isProfile ? 'active' : ''}`}
+                title="Xem hồ sơ & Bộ sưu tập thẻ bài"
+              >
+                <Star size={16} fill={isProfile ? '#fbbf24' : 'none'} color={isProfile ? '#fbbf24' : '#e2e8f0'} />
+                <span>Bộ sưu tập ({user.favorites?.length || 0})</span>
+              </Link>
+
+              <Link
+                to="/profile"
+                className="nav-user"
+                style={{ textDecoration: 'none', cursor: 'pointer' }}
+                title="Trang cá nhân"
+              >
+                <User size={16} />
+                <span><strong>{user.username}</strong></span>
+              </Link>
+
+              <button className="nav-header-btn" onClick={handleLogout} type="button" title="Đăng xuất">
                 <LogOut size={16} /> Đăng xuất
               </button>
             </>

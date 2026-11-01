@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const User = require('../models/User');
+const Card = require('../models/Card');
 
 // Mã hoá mật khẩu bằng scrypt (có sẵn trong Node, không cần cài thêm)
 function hashPassword(password) {
@@ -32,12 +33,12 @@ exports.register = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Tên đăng nhập đã tồn tại' });
     }
 
-    const user = await User.create({ username, password: hashPassword(password) });
+    const user = await User.create({ username, password: hashPassword(password), favorites: [] });
 
     return res.status(201).json({
       success: true,
       message: 'Đăng ký thành công',
-      data: { id: user._id, username: user.username }
+      data: { id: user._id, username: user.username, createdAt: user.createdAt, favorites: [] }
     });
   } catch (error) {
     console.error('[register error]', error);
@@ -63,10 +64,128 @@ exports.login = async (req, res) => {
     return res.json({
       success: true,
       message: 'Đăng nhập thành công',
-      data: { id: user._id, username: user.username }
+      data: {
+        id: user._id,
+        username: user.username,
+        createdAt: user.createdAt,
+        favorites: user.favorites || []
+      }
     });
   } catch (error) {
     console.error('[login error]', error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Lấy thông tin cá nhân (Profile) kèm chi tiết các lá bài yêu thích
+exports.getProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId).select('-password').lean();
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Người dùng không tồn tại' });
+    }
+
+    // Lấy chi tiết danh sách card theo mảng id trong favorites
+    const favoriteCards = await Card.find({ id: { $in: user.favorites || [] } }).lean();
+
+    // Tính tổng giá trị bộ sưu tập theo min_price
+    const totalCollectionValue = favoriteCards.reduce((sum, card) => sum + (card.min_price || 0), 0);
+
+    return res.json({
+      success: true,
+      data: {
+        id: user._id,
+        username: user.username,
+        createdAt: user.createdAt,
+        favorites: user.favorites || [],
+        favoriteCards,
+        stats: {
+          totalCards: favoriteCards.length,
+          totalValue: Number(totalCollectionValue.toFixed(2))
+        }
+      }
+    });
+  } catch (error) {
+    console.error('[getProfile error]', error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Đổi mật khẩu
+exports.changePassword = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ success: false, message: 'Vui lòng nhập mật khẩu cũ và mật khẩu mới' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, message: 'Mật khẩu mới phải có ít nhất 6 ký tự' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Người dùng không tồn tại' });
+    }
+
+    if (!verifyPassword(oldPassword, user.password)) {
+      return res.status(400).json({ success: false, message: 'Mật khẩu hiện tại không chính xác' });
+    }
+
+    user.password = hashPassword(newPassword);
+    await user.save();
+
+    return res.json({
+      success: true,
+      message: 'Đổi mật khẩu thành công'
+    });
+  } catch (error) {
+    console.error('[changePassword error]', error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Thêm / Bỏ yêu thích một lá bài (Toggle favorite)
+exports.toggleFavorite = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const cardId = Number(req.body.cardId);
+
+    if (!cardId) {
+      return res.status(400).json({ success: false, message: 'Thiếu cardId hợp lệ' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Người dùng không tồn tại' });
+    }
+
+    const index = (user.favorites || []).indexOf(cardId);
+    let isFavorited = false;
+
+    if (index > -1) {
+      // Đã có -> Xóa khỏi danh sách yêu thích
+      user.favorites.splice(index, 1);
+      isFavorited = false;
+    } else {
+      // Chưa có -> Thêm vào danh sách yêu thích
+      user.favorites.push(cardId);
+      isFavorited = true;
+    }
+
+    await user.save();
+
+    return res.json({
+      success: true,
+      isFavorited,
+      favorites: user.favorites,
+      message: isFavorited ? 'Đã thêm vào bộ sưu tập' : 'Đã xóa khỏi bộ sưu tập'
+    });
+  } catch (error) {
+    console.error('[toggleFavorite error]', error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
