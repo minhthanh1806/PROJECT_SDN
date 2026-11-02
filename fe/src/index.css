@@ -530,6 +530,14 @@ button.nav-header-btn {
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
+.card-item-link {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
+}
+
 .card-item:hover {
   transform: translateY(-4px);
   box-shadow: var(--card-hover-shadow);
@@ -866,6 +874,36 @@ button.nav-header-btn {
   text-align: center;
   font-size: 0.85rem;
   color: var(--text-secondary);
+}
+
+.detail-fav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.detail-fav-btn:hover {
+  border-color: #fbbf24;
+  background-color: rgba(251, 191, 36, 0.1);
+  color: #fbbf24;
+}
+
+.detail-fav-btn.favorited {
+  background-color: rgba(251, 191, 36, 0.15);
+  border-color: #fbbf24;
+  color: #fbbf24;
 }
 
 .detail-card-name {
@@ -1377,6 +1415,50 @@ button.nav-header-btn {
   .pagination {
     flex-wrap: wrap;
     gap: 0.3rem;
+  }
+
+  /* Detail page trên mobile */
+  .detail-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .card-large-wrap {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .detail-left-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .detail-fav-btn {
+    max-width: 280px;
+  }
+
+  .detail-card-name {
+    font-size: 1.45rem;
+    text-align: center;
+  }
+
+  .detail-badges {
+    justify-content: center;
+  }
+
+  .detail-stats-bar {
+    justify-content: center;
+  }
+
+  .price-grid-5 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .price-widget-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
   }
 
   .page-btn {
