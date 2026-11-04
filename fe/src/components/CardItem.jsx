@@ -68,6 +68,18 @@ export default function CardItem({ card, onFavoriteChange }) {
             <Star size={16} fill={isFavorited ? '#fbbf24' : 'none'} color={isFavorited ? '#fbbf24' : '#ffffff'} />
           </button>
 
+          {/* Huy hiệu trạng thái Banlist */}
+          {card.banlist_info?.ban_tcg && card.banlist_info.ban_tcg !== 'Unlimited' && (
+            <span
+              className={`card-ban-badge ban-${card.banlist_info.ban_tcg.toLowerCase().replace(/[^a-z]/g, '')}`}
+              title={`Banlist TCG: ${card.banlist_info.ban_tcg}`}
+            >
+              {card.banlist_info.ban_tcg === 'Forbidden' && 'CẤM'}
+              {card.banlist_info.ban_tcg === 'Limited' && 'GIỚI HẠN 1'}
+              {card.banlist_info.ban_tcg === 'Semi-Limited' && 'GIỚI HẠN 2'}
+            </span>
+          )}
+
           {card.level !== undefined && (
             <span className="card-level-badge">⭐ {card.level}</span>
           )}
@@ -75,6 +87,13 @@ export default function CardItem({ card, onFavoriteChange }) {
 
         <div className="card-info">
           <h4 className="card-name" title={card.name}>{card.name}</h4>
+
+          {/* Hiển thị thay đổi trạng thái Banlist (vd: Unlimited ➔ Forbidden) */}
+          {card.is_ban_change && card.prev_ban_status && (
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#f59e0b', marginBottom: '0.3rem' }}>
+              {card.prev_ban_status} ➔ {card.banlist_info?.ban_tcg}
+            </div>
+          )}
           
           {/* Type & Attribute */}
           <div className="card-tags">

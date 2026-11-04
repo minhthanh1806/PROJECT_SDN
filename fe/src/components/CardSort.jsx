@@ -10,8 +10,8 @@ export default function CardSort({ sortBy, onSortChange }) {
         aria-label="Sắp xếp theo giá"
       >
         <option value="name">Tên: A → Z</option>
-        <option value="price_asc">Giá: Thấp → Cao 📈</option>
-        <option value="price_desc">Giá: Cao → Thấp 📉</option>
+        <option value="price_asc">Giá: Thấp → Cao</option>
+        <option value="price_desc">Giá: Cao → Thấp</option>
       </select>
     </div>
   );

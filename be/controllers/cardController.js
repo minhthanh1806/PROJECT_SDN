@@ -156,17 +156,113 @@ exports.getCardById = async (req, res) => {
   }
 };
 
-// Lấy toàn bộ danh sách các lá bài thuộc Banlist (155 Forbidden + 91 Limited + 7 Semi-Limited = 253 lá)
-// Hỗ trợ gom nhóm (grouped = true) hoặc trả về phẳng
+// Đọc dữ liệu lịch sử Banlist TCG chính thức từ YGOPRODeck (2022 - 2026)
+const ygoprodeckBanlistPath = path.join(__dirname, '../data/ygoprodeck_tcg_banlists.json');
+let YGOPRODECK_BANLISTS = {};
+try {
+  if (fs.existsSync(ygoprodeckBanlistPath)) {
+    YGOPRODECK_BANLISTS = JSON.parse(fs.readFileSync(ygoprodeckBanlistPath, 'utf8'));
+  }
+} catch (err) {
+  console.error('[Load ygoprodeck_tcg_banlists.json error]', err);
+}
+
+// Lấy toàn bộ danh sách các lá bài thuộc Banlist (chuẩn YGOPRODeck API)
+// Hỗ trợ gom nhóm (format=grouped), lọc theo tháng (month=YYYY-MM) và chế độ xem (mode=changes | full)
 exports.getSampleBannedCards = async (req, res) => {
   try {
-    const { format } = req.query; // format=grouped hoặc phẳng
+    const { format, date, month, mode = 'changes' } = req.query;
+
+    const targetMonth = month ? month.trim() : (date && date.trim().length === 7 ? date.trim() : null);
+    const targetDate = !targetMonth && date && date.trim() !== '' ? date.trim() : null;
+
+    // Tạo danh sách monthSummaries chuẩn xác từ YGOPRODeck (2022 -> 2026)
+    const monthSummaries = Object.values(YGOPRODECK_BANLISTS)
+      .sort((a, b) => b.month.localeCompare(a.month))
+      .map(m => ({
+        month: m.month,
+        label: `Tháng ${String(m.monthNum).padStart(2, '0')}/${m.year}`,
+        year: m.year,
+        monthNum: m.monthNum,
+        dates: [m.date],
+        totalCount: mode === 'full' ? m.fullStats.totalCount : m.changeStats.totalCount,
+        forbiddenCount: mode === 'full' ? m.fullStats.forbiddenCount : m.changeStats.forbiddenCount,
+        limitedCount: mode === 'full' ? m.fullStats.limitedCount : m.changeStats.limitedCount,
+        semiLimitedCount: mode === 'full' ? m.fullStats.semiLimitedCount : m.changeStats.semiLimitedCount,
+        changeStats: m.changeStats,
+        fullStats: m.fullStats
+      }));
+
+    // Nếu chọn một tháng cụ thể trong dữ liệu chính thức YGOPRODeck (2022 - 2026)
+    const effectiveMonth = targetMonth || (targetDate ? targetDate.slice(0, 7) : null);
+    if (effectiveMonth && YGOPRODECK_BANLISTS[effectiveMonth]) {
+      const mData = YGOPRODECK_BANLISTS[effectiveMonth];
+      const sourceEntries = mode === 'full' ? mData.fullCards : mData.changedCards;
+      const entryMap = new Map(sourceEntries.map(e => [Number(e.id), e]));
+      const cardIds = Array.from(entryMap.keys());
+
+      const dbCards = await Card.find({ id: { $in: cardIds } }).sort({ name: 1 }).lean();
+
+      // Gắn đúng trạng thái ban_tcg, prev_ban_status và ban_date tại thời điểm tháng đó
+      const enrichedCards = dbCards.map(card => {
+        const entry = entryMap.get(Number(card.id));
+        return {
+          ...card,
+          ban_date: `${mData.date}T00:00:00.000Z`,
+          prev_ban_status: entry.prevStatus,
+          is_ban_change: entry.isChange,
+          banlist_info: {
+            ...(card.banlist_info || {}),
+            ban_tcg: entry.status
+          }
+        };
+      });
+
+      if (format === 'grouped') {
+        const forbidden = enrichedCards.filter(c => c.banlist_info.ban_tcg === 'Forbidden');
+        const limited = enrichedCards.filter(c => c.banlist_info.ban_tcg === 'Limited');
+        const semiLimited = enrichedCards.filter(c => c.banlist_info.ban_tcg === 'Semi-Limited');
+
+        return res.json({
+          success: true,
+          data: {
+            forbidden,
+            limited,
+            semiLimited,
+            monthSummaries,
+            availableMonths: monthSummaries.map(s => s.month),
+            availableDates: monthSummaries.map(s => s.dates[0]),
+            stats: {
+              forbiddenCount: forbidden.length,
+              limitedCount: limited.length,
+              semiLimitedCount: semiLimited.length,
+              totalCount: enrichedCards.length
+            }
+          }
+        });
+      }
+
+      return res.json({
+        success: true,
+        data: enrichedCards,
+        totalCount: enrichedCards.length
+      });
+    }
+
+    // Mặc định (Xem toàn bộ 253 lá bài trong Banlist hiện hành hoặc lọc pre-2022)
+    const baseQuery = {
+      'banlist_info.ban_tcg': { $in: ['Forbidden', 'Limited', 'Semi-Limited'] }
+    };
+
+    if (effectiveMonth === 'pre-2022' || effectiveMonth === '2021-01') {
+      baseQuery.ban_date = { $lte: new Date('2021-12-31T23:59:59.999Z') };
+    }
 
     if (format === 'grouped') {
       const [forbidden, limited, semiLimited] = await Promise.all([
-        Card.find({ 'banlist_info.ban_tcg': 'Forbidden' }).sort({ name: 1 }).lean(),
-        Card.find({ 'banlist_info.ban_tcg': 'Limited' }).sort({ name: 1 }).lean(),
-        Card.find({ 'banlist_info.ban_tcg': 'Semi-Limited' }).sort({ name: 1 }).lean()
+        Card.find({ ...baseQuery, 'banlist_info.ban_tcg': 'Forbidden' }).sort({ name: 1 }).lean(),
+        Card.find({ ...baseQuery, 'banlist_info.ban_tcg': 'Limited' }).sort({ name: 1 }).lean(),
+        Card.find({ ...baseQuery, 'banlist_info.ban_tcg': 'Semi-Limited' }).sort({ name: 1 }).lean()
       ]);
 
       return res.json({
@@ -175,6 +271,9 @@ exports.getSampleBannedCards = async (req, res) => {
           forbidden,
           limited,
           semiLimited,
+          monthSummaries,
+          availableMonths: monthSummaries.map(s => s.month),
+          availableDates: monthSummaries.map(s => s.dates[0]),
           stats: {
             forbiddenCount: forbidden.length,
             limitedCount: limited.length,
@@ -185,9 +284,7 @@ exports.getSampleBannedCards = async (req, res) => {
       });
     }
 
-    const cards = await Card.find({
-      'banlist_info.ban_tcg': { $in: ['Forbidden', 'Limited', 'Semi-Limited'] }
-    })
+    const cards = await Card.find(baseQuery)
       .sort({ name: 1 })
       .lean();
 
@@ -198,48 +295,6 @@ exports.getSampleBannedCards = async (req, res) => {
     });
   } catch (error) {
     console.error('[getSampleBannedCards error]', error);
-    return res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// Lấy danh sách metadata cho bộ lọc (types, attributes, races, archetypes)
-exports.getFilterOptions = async (req, res) => {
-  try {
-    const [types, attributes, races] = await Promise.all([
-      Card.distinct('type'),
-      Card.distinct('attribute'),
-      Card.distinct('race')
-    ]);
-
-    return res.json({
-      success: true,
-      data: {
-        types: types.filter(Boolean).sort(),
-        attributes: attributes.filter(Boolean).sort(),
-        races: races.filter(Boolean).sort()
-      }
-    });
-  } catch (error) {
-    console.error('[getFilterOptions error]', error);
-    return res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// Lấy thẻ bài theo mã bộ thẻ (set_code)
-exports.getCardsBySet = async (req, res) => {
-  try {
-    const { setCode } = req.params;
-    const cards = await Card.find({
-      'card_sets.set_code': { $regex: `^${setCode}`, $options: 'i' }
-    }).lean();
-
-    return res.json({
-      success: true,
-      data: cards,
-      count: cards.length
-    });
-  } catch (error) {
-    console.error('[getCardsBySet error]', error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
