@@ -5,40 +5,92 @@ import SearchBar from '../components/SearchBar';
 import CardGrid from '../components/CardGrid';
 import Pagination from '../components/Pagination';
 import { getSampleBannedCards } from '../services/api';
-import { ShieldAlert, AlertTriangle, AlertCircle, ArrowLeft } from 'lucide-react';
 
 const CARDS_PER_PAGE = 12;
+
+// Định dạng chuỗi YYYY-MM sang "Tháng MM/YYYY"
+function formatMonthLabel(monthStr) {
+  if (!monthStr) return '';
+  if (monthStr === 'pre-2022' || monthStr === '2021-01') return 'Trước năm 2022 (Cổ điển)';
+  const [y, m] = monthStr.split('-');
+  return `Tháng ${m}/${y}`;
+}
+
+// Định dạng ngày YYYY-MM-DD sang "DD/MM/YYYY"
+function formatShortDate(dateStr) {
+  if (!dateStr) return '';
+  const [y, m, d] = dateStr.slice(0, 10).split('-');
+  return `${d}/${m}/${y}`;
+}
+
+// Lấy nhãn năm hiển thị (vd: "Năm 2026 • Mới nhất")
+function getYearBadge(monthStr, isLatest) {
+  if (!monthStr) return '';
+  const year = monthStr.slice(0, 4);
+  if (isLatest) return `Năm ${year} • Mới nhất`;
+  return `Năm ${year}`;
+}
 
 export default function BanlistPage() {
   const [data, setData] = useState({
     forbidden: [],
     limited: [],
     semiLimited: [],
+    monthSummaries: [],
+    availableMonths: [],
     stats: { forbiddenCount: 0, limitedCount: 0, semiLimitedCount: 0, totalCount: 0 }
   });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'forbidden', 'limited', 'semi'
+  const [selectedYear, setSelectedYear] = useState('all'); // 'all', '2026', '2025', '2024', '2023', '2022'
+  const [selectedMonth, setSelectedMonth] = useState(''); // Mặc định rỗng = xem tất cả 253 lá hiện tại
+  const [banMode, setBanMode] = useState('changes'); // 'changes' (chỉ lá mới bị phạt đợt đó) | 'full' (toàn bộ banlist đợt đó)
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' hoặc 'list'
 
-  useEffect(() => {
+  // Tải dữ liệu từ server theo tháng và chế độ xem
+  const fetchBanlistData = (monthParam = '', modeParam = 'changes') => {
     setLoading(true);
-    getSampleBannedCards({ format: 'grouped' })
+    const params = { format: 'grouped', mode: modeParam };
+    if (monthParam) params.month = monthParam;
+
+    getSampleBannedCards(params)
       .then((res) => {
         if (res.data?.success) {
-          setData(res.data.data);
+          setData((prev) => ({
+            ...res.data.data,
+            monthSummaries:
+              res.data.data.monthSummaries && res.data.data.monthSummaries.length > 0
+                ? res.data.data.monthSummaries
+                : prev.monthSummaries,
+            availableMonths:
+              res.data.data.availableMonths && res.data.data.availableMonths.length > 0
+                ? res.data.data.availableMonths
+                : prev.availableMonths
+          }));
         }
       })
       .catch((err) => console.error('Error fetching banlist:', err))
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => {
+    fetchBanlistData(selectedMonth, banMode);
+  }, [selectedMonth, banMode]);
+
+  // Lọc danh sách các tháng hiển thị trên thanh Timeline theo Năm đang chọn
+  const visibleMonthSummaries = useMemo(() => {
+    const list = data.monthSummaries || [];
+    if (selectedYear === 'all') return list;
+    return list.filter((item) => String(item.year) === String(selectedYear));
+  }, [data.monthSummaries, selectedYear]);
 
   // Lọc theo Tab được chọn
   const activeCards = useMemo(() => {
     if (activeTab === 'forbidden') return data.forbidden || [];
     if (activeTab === 'limited') return data.limited || [];
     if (activeTab === 'semi') return data.semiLimited || [];
-    // 'all': gom cả 3 nhóm
     return [...(data.forbidden || []), ...(data.limited || []), ...(data.semiLimited || [])];
   }, [data, activeTab]);
 
@@ -65,6 +117,22 @@ export default function BanlistPage() {
     setCurrentPage(1);
   };
 
+  const handleMonthSelect = (month) => {
+    setSelectedMonth(month);
+    setCurrentPage(1);
+  };
+
+  const handleYearFilter = (year) => {
+    setSelectedYear(year);
+    if (year !== 'all' && selectedMonth && !selectedMonth.startsWith(year)) {
+      const firstMonthOfYear = data.monthSummaries?.find((m) => String(m.year) === String(year));
+      if (firstMonthOfYear) {
+        setSelectedMonth(firstMonthOfYear.month);
+        setCurrentPage(1);
+      }
+    }
+  };
+
   const handleSearchChange = (term) => {
     setSearchTerm(term);
     setCurrentPage(1);
@@ -75,98 +143,494 @@ export default function BanlistPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Lấy thông tin chi tiết của tháng đang chọn
+  const currentMonthSummary = useMemo(() => {
+    if (!selectedMonth || !data.monthSummaries) return null;
+    return data.monthSummaries.find((m) => m.month === selectedMonth);
+  }, [selectedMonth, data.monthSummaries]);
+
   return (
     <div className="app-shell">
       <Navbar />
 
       <main className="container" style={{ padding: '2rem 1.25rem 3rem' }}>
-        {/* Thanh tiêu đề */}
-        <div
-          style={{
-            maxWidth: '1000px',
-            margin: '0 auto 1.5rem',
-          }}
-        >
-          <div>
-            <h1 style={{ fontSize: '1.6rem', fontWeight: 700, margin: '0 0 0.25rem' }}>
-              Danh Sách Thẻ Bài Bị Cấm & Giới Hạn (Banlist)
-            </h1>
-            <p style={{ color: '#94a3b8', margin: 0, fontSize: '0.9rem' }}>
-              Cập nhật quy định thi đấu TCG mới nhất với tổng cộng <strong>{data.stats.totalCount}</strong> lá bài
-            </p>
+        {/* Tiêu đề trang */}
+        <div style={{ maxWidth: '1100px', margin: '0 auto 1.5rem' }}>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '0 0 0.4rem' }}>
+            Lịch Sử Banlist TCG Theo Tháng (2022 - 2026)
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '0.95rem' }}>
+            Đồng bộ dữ liệu từ <strong>YGOPRODeck Banlist</strong> (18 đợt cập nhật từ tháng 02/2022 đến tháng 10/2026). Nhấn vào từng tháng để xem các lá bài bị phạt hoặc toàn bộ danh sách hiệu lực.
+          </p>
+        </div>
+
+        {/* ============================================================
+            DẢI TIMELINE CHỌN BANLIST THEO NĂM & THÁNG (2022 - 2026)
+            ============================================================ */}
+        <div style={{ maxWidth: '1100px', margin: '0 auto 1.75rem' }}>
+          {/* Hàng lọc nhanh theo Năm & Chế độ xem */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.85rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-secondary)', marginRight: '0.25rem' }}>
+                Năm cập nhật:
+              </span>
+              {['all', '2026', '2025', '2024', '2023', '2022'].map((yr) => (
+                <button
+                  key={yr}
+                  type="button"
+                  onClick={() => handleYearFilter(yr)}
+                  style={{
+                    padding: '0.35rem 0.75rem',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border-color)',
+                    background: selectedYear === yr ? 'var(--primary)' : 'var(--bg-secondary)',
+                    color: selectedYear === yr ? '#fff' : 'var(--text-primary)',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s'
+                  }}
+                >
+                  {yr === 'all' ? 'Tất cả (2022 - 2026)' : `Năm ${yr}`}
+                </button>
+              ))}
+            </div>
+
+            {/* Chế độ xem khi chọn tháng: Chỉ lá mới dính đạn vs Toàn bộ Banlist */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '2px' }}>
+                <button
+                  type="button"
+                  onClick={() => { setBanMode('changes'); setCurrentPage(1); }}
+                  style={{
+                    padding: '0.35rem 0.7rem',
+                    border: 'none',
+                    borderRadius: '6px',
+                    background: banMode === 'changes' ? '#ef4444' : 'transparent',
+                    color: banMode === 'changes' ? '#fff' : 'var(--text-secondary)',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                  title="Chỉ hiển thị những lá bài mới bị cấm / thay đổi trạng thái trong tháng đó"
+                >
+                  Lá mới bị phạt
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setBanMode('full'); setCurrentPage(1); }}
+                  style={{
+                    padding: '0.35rem 0.7rem',
+                    border: 'none',
+                    borderRadius: '6px',
+                    background: banMode === 'full' ? 'var(--primary)' : 'transparent',
+                    color: banMode === 'full' ? '#fff' : 'var(--text-secondary)',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                  title="Hiển thị toàn bộ các lá bài nằm trong Banlist tại thời điểm tháng đó"
+                >
+                  Toàn bộ Banlist tháng đó
+                </button>
+              </div>
+
+              {selectedMonth && (
+                <button
+                  type="button"
+                  onClick={() => handleMonthSelect('')}
+                  className="nav-header-btn"
+                  style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+                  title="Xem lại toàn bộ 253 lá bài hiện hành"
+                >
+                  Xem hiện tại (253 lá)
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Dải nút chọn từng Tháng cập nhật */}
+          <div className="timeline-scroll-wrap">
+            {/* Nút Xem toàn bộ Banlist hiện hành */}
+            <button
+              type="button"
+              onClick={() => handleMonthSelect('')}
+              className={`timeline-wave-btn ${!selectedMonth ? 'active' : ''}`}
+            >
+              <span className="timeline-wave-badge">
+                Banlist Hiện Hành
+              </span>
+              <span className="timeline-wave-date" style={{ fontSize: '1.05rem' }}>
+                Tất Cả (253 Lá)
+              </span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                155 Cấm • 91 Hạn chế 1 • 7 Hạn chế 2
+              </span>
+              <span className="timeline-wave-count">
+                Toàn bộ TCG Banlist
+              </span>
+            </button>
+
+            {/* Danh sách 18 đợt Banlist chính thức từ YGOPRODeck (2022 - 2026) */}
+            {visibleMonthSummaries.map((item) => {
+              const isSelected = selectedMonth === item.month;
+              const isLatest = item.month === '2026-10';
+              const exactDate = item.dates?.[0] ? formatShortDate(item.dates[0]) : '';
+              const changeCount = item.changeStats?.totalCount ?? item.totalCount;
+              const fullCount = item.fullStats?.totalCount ?? item.totalCount;
+
+              return (
+                <button
+                  key={item.month}
+                  type="button"
+                  onClick={() => handleMonthSelect(item.month)}
+                  className={`timeline-wave-btn ${isSelected ? 'active' : ''}`}
+                >
+                  <span className="timeline-wave-badge">
+                    {getYearBadge(item.month, isLatest)}
+                  </span>
+                  <span className="timeline-wave-date" style={{ fontSize: '1.05rem', color: isSelected ? 'var(--primary)' : 'inherit' }}>
+                    {formatMonthLabel(item.month)}
+                  </span>
+                  {exactDate && (
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                      Hiệu lực: {exactDate}
+                    </span>
+                  )}
+                  <span className="timeline-wave-count">
+                    {banMode === 'changes' ? (
+                      <><strong>{changeCount} lá</strong> mới bị phạt</>
+                    ) : (
+                      <>Tổng <strong>{fullCount} lá</strong> hiệu lực</>
+                    )}
+                  </span>
+                </button>
+              );
+            })}
+
+            {/* Nút xem các lá cổ điển bị cấm từ trước năm 2022 */}
+            {selectedYear === 'all' && (
+              <button
+                type="button"
+                onClick={() => handleMonthSelect('pre-2022')}
+                className={`timeline-wave-btn ${selectedMonth === 'pre-2022' ? 'active' : ''}`}
+              >
+                <span className="timeline-wave-badge">
+                  Lịch Sử Cổ Điển
+                </span>
+                <span className="timeline-wave-date" style={{ fontSize: '1.05rem', color: selectedMonth === 'pre-2022' ? 'var(--primary)' : 'inherit' }}>
+                  Trước năm 2022
+                </span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                  Pot of Greed, Exodia, Maxx &quot;C&quot;...
+                </span>
+                <span className="timeline-wave-count">
+                  Các lá bài cổ điển
+                </span>
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Các tab chuyển đổi nhanh: Tất cả / Cấm / Hạn chế 1 / Hạn chế 2 */}
+        {/* ============================================================
+            BẢNG THÔNG BÁO CHI TIẾT THÁNG ĐƯỢC CHỌN
+            ============================================================ */}
+        {selectedMonth && (
+          <div style={{ maxWidth: '1100px', margin: '0 auto 1.5rem' }}>
+            <div className="ban-summary-panel">
+              <div>
+                <div className="ban-summary-title">
+                  <span>
+                    Banlist <strong>{formatMonthLabel(selectedMonth)}</strong>
+                    {currentMonthSummary?.dates?.[0] && (
+                      <span style={{ fontWeight: 500, fontSize: '0.95rem', marginLeft: 8, color: 'var(--text-secondary)' }}>
+                        (Ngày hiệu lực: {formatShortDate(currentMonthSummary.dates[0])})
+                      </span>
+                    )}
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                  {banMode === 'changes' && selectedMonth !== 'pre-2022' ? (
+                    <>
+                      Đợt này có <strong>{data.stats.totalCount} lá bài</strong> mới bị cấm / thay đổi giới hạn (Bấm <em>&quot;Toàn bộ Banlist tháng đó&quot;</em> ở góc trên nếu muốn xem đủ {currentMonthSummary?.fullStats?.totalCount || ''} lá):
+                    </>
+                  ) : (
+                    <>
+                      Tổng cộng <strong>{data.stats.totalCount} lá bài</strong> nằm trong danh sách cấm & giới hạn của đợt này:
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="ban-chips-row">
+                <span className="ban-chip chip-forbidden">
+                  Bị cấm: <strong>{data.stats.forbiddenCount}</strong> lá
+                </span>
+                <span className="ban-chip chip-limited">
+                  Giới hạn 1: <strong>{data.stats.limitedCount}</strong> lá
+                </span>
+                <span className="ban-chip chip-semi">
+                  Giới hạn 2: <strong>{data.stats.semiLimitedCount}</strong> lá
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ============================================================
+            THANH CÔNG CỤ: TAB LỌC TRẠNG THÁI & CHẾ ĐỘ HIỂN THỊ
+            ============================================================ */}
         <div
           style={{
-            maxWidth: '1000px',
-            margin: '0 auto 1.5rem',
+            maxWidth: '1100px',
+            margin: '0 auto 1.25rem',
             display: 'flex',
-            gap: '0.75rem',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             flexWrap: 'wrap',
+            gap: '0.75rem',
           }}
         >
-          <button
-            onClick={() => handleTabChange('all')}
-            className={`ban-tab-btn ${activeTab === 'all' ? 'active' : ''}`}
-          >
-            Tất cả ({data.stats.totalCount})
-          </button>
+          {/* Các tab chuyển đổi nhanh: Tất cả / Cấm / Hạn chế 1 / Hạn chế 2 */}
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => handleTabChange('all')}
+              className={`ban-tab-btn ${activeTab === 'all' ? 'active' : ''}`}
+            >
+              Tất cả ({data.stats.totalCount})
+            </button>
 
-          <button
-            onClick={() => handleTabChange('forbidden')}
-            className={`ban-tab-btn tab-forbidden ${activeTab === 'forbidden' ? 'active' : ''}`}
-          >
-            <ShieldAlert size={16} /> Bị cấm - Forbidden ({data.stats.forbiddenCount})
-          </button>
+            <button
+              onClick={() => handleTabChange('forbidden')}
+              className={`ban-tab-btn tab-forbidden ${activeTab === 'forbidden' ? 'active' : ''}`}
+            >
+              Bị cấm ({data.stats.forbiddenCount})
+            </button>
 
-          <button
-            onClick={() => handleTabChange('limited')}
-            className={`ban-tab-btn tab-limited ${activeTab === 'limited' ? 'active' : ''}`}
-          >
-            <AlertTriangle size={16} /> Hạn chế 1 - Limited ({data.stats.limitedCount})
-          </button>
+            <button
+              onClick={() => handleTabChange('limited')}
+              className={`ban-tab-btn tab-limited ${activeTab === 'limited' ? 'active' : ''}`}
+            >
+              Giới hạn 1 ({data.stats.limitedCount})
+            </button>
 
-          <button
-            onClick={() => handleTabChange('semi')}
-            className={`ban-tab-btn tab-semi ${activeTab === 'semi' ? 'active' : ''}`}
-          >
-            <AlertCircle size={16} /> Hạn chế 2 - Semi ({data.stats.semiLimitedCount})
-          </button>
+            <button
+              onClick={() => handleTabChange('semi')}
+              className={`ban-tab-btn tab-semi ${activeTab === 'semi' ? 'active' : ''}`}
+            >
+              Giới hạn 2 ({data.stats.semiLimitedCount})
+            </button>
+          </div>
+
+          {/* Nút chuyển đổi giao diện: Lưới (Grid) hoặc Danh sách (List/Table) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '3px' }}>
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              style={{
+                padding: '0.4rem 0.75rem',
+                border: 'none',
+                borderRadius: '6px',
+                background: viewMode === 'grid' ? 'var(--primary)' : 'transparent',
+                color: viewMode === 'grid' ? '#fff' : 'var(--text-secondary)',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+              title="Xem dạng thẻ ảnh"
+            >
+              Dạng lưới
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setViewMode('list')}
+              style={{
+                padding: '0.4rem 0.75rem',
+                border: 'none',
+                borderRadius: '6px',
+                background: viewMode === 'list' ? 'var(--primary)' : 'transparent',
+                color: viewMode === 'list' ? '#fff' : 'var(--text-secondary)',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+              title="Xem dạng bảng danh sách"
+            >
+              Dạng danh sách
+            </button>
+          </div>
         </div>
 
-        {/* Thanh tìm kiếm lá bài trong Banlist */}
-        <div style={{ maxWidth: '1000px', margin: '0 auto 1.5rem' }}>
+        {/* Thanh tìm kiếm thẻ bài */}
+        <div style={{ maxWidth: '1100px', margin: '0 auto 1.25rem' }}>
           <SearchBar
             value={searchTerm}
             onChange={handleSearchChange}
-            placeholder="Tìm kiếm thẻ trong danh sách cấm (vd: Pot of Greed, Kashtira, Spright...)"
+            placeholder={
+              selectedMonth
+                ? `Tìm kiếm lá bài trong ${formatMonthLabel(selectedMonth)}...`
+                : 'Tìm kiếm thẻ trong Banlist (vd: Barrier Statue, Fossil Dyna, Baronne, Apollousa, Ryzeal...)'
+            }
           />
         </div>
 
         {/* Thông tin số lượng hiển thị */}
         <div
           style={{
-            maxWidth: '1000px',
+            maxWidth: '1100px',
             margin: '0 auto 1.25rem',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             fontSize: '0.9rem',
-            color: '#64748b',
+            color: 'var(--text-secondary)',
           }}
         >
           <span>
-            Đang xem: <strong>{paginatedCards.length}</strong> / <strong>{filteredCards.length}</strong> lá bài
+            Đang hiển thị: <strong>{paginatedCards.length}</strong> / <strong>{filteredCards.length}</strong> lá bài
+            {selectedMonth && (
+              <span style={{ marginLeft: 6, color: '#3b82f6', fontWeight: 600 }}>
+                • {formatMonthLabel(selectedMonth)}
+              </span>
+            )}
           </span>
           <span>
             Trang <strong>{currentPage}</strong> / {totalPages} ({CARDS_PER_PAGE} thẻ/trang)
           </span>
         </div>
 
-        {/* Danh sách thẻ bài hiển thị */}
-        <CardGrid cards={paginatedCards} loading={loading} />
+        {/* ============================================================
+            HIỂN THỊ DANH SÁCH THẺ (DẠNG LƯỚI HOẶC BẢNG DANH SÁCH)
+            ============================================================ */}
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          {viewMode === 'grid' ? (
+            <CardGrid cards={paginatedCards} loading={loading} />
+          ) : (
+            <div className="table-responsive">
+              <table className="banlist-table">
+                <thead>
+                  <tr>
+                    <th style={{ width: '50px', textAlign: 'center' }}>STT</th>
+                    <th style={{ width: '70px', textAlign: 'center' }}>Ảnh</th>
+                    <th>Tên lá bài</th>
+                    <th>Loại / Tộc</th>
+                    <th style={{ width: '160px', textAlign: 'center' }}>Án phạt</th>
+                    <th style={{ width: '175px' }}>Tháng cập nhật</th>
+                    <th style={{ width: '110px', textAlign: 'right' }}>Giá rẻ nhất</th>
+                    <th style={{ width: '100px', textAlign: 'center' }}>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedCards.length === 0 ? (
+                    <tr>
+                      <td colSpan="8" style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-secondary)' }}>
+                        Không tìm thấy lá bài nào khớp với bộ lọc
+                      </td>
+                    </tr>
+                  ) : (
+                    paginatedCards.map((card, index) => {
+                      const stt = (currentPage - 1) * CARDS_PER_PAGE + index + 1;
+                      const banStatus = card.banlist_info?.ban_tcg;
+                      const cardDate = card.ban_date ? card.ban_date.slice(0, 10) : '';
+                      const cardYear = cardDate ? Number(cardDate.slice(0, 4)) : 0;
+                      const isLegacy = cardYear > 0 && cardYear < 2022;
+                      const cardMonth = isLegacy ? 'pre-2022' : (cardDate ? cardDate.slice(0, 7) : selectedMonth);
+                      const thumbUrl = card.card_images?.[0]?.image_url_small || `/images/cards/${card.id}_small.jpg`;
+
+                      return (
+                        <tr key={card.id}>
+                          <td style={{ textAlign: 'center', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                            {stt}
+                          </td>
+                          <td style={{ textAlign: 'center' }}>
+                            <Link to={`/card/${card.id}`}>
+                              <img
+                                src={thumbUrl}
+                                alt={card.name}
+                                className="banlist-thumb"
+                                onError={(e) => {
+                                  e.target.src = 'https://images.ygoprodeck.com/images/cards_small/back.jpg';
+                                }}
+                              />
+                            </Link>
+                          </td>
+                          <td>
+                            <Link to={`/card/${card.id}`} style={{ fontWeight: 700, color: 'var(--text-primary)' }}>
+                              {card.name}
+                            </Link>
+                            {card.level !== undefined && (
+                              <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginLeft: 8 }}>
+                                (Lv.{card.level})
+                              </span>
+                            )}
+                          </td>
+                          <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                            <div>{card.type}</div>
+                            {card.race && <span style={{ opacity: 0.8 }}>({card.race})</span>}
+                          </td>
+                          <td style={{ textAlign: 'center' }}>
+                            {banStatus === 'Forbidden' && (
+                              <span className="card-ban-badge ban-forbidden" style={{ position: 'static' }}>
+                                CẤM
+                              </span>
+                            )}
+                            {banStatus === 'Limited' && (
+                              <span className="card-ban-badge ban-limited" style={{ position: 'static' }}>
+                                HẠN CHẾ 1
+                              </span>
+                            )}
+                            {banStatus === 'Semi-Limited' && (
+                              <span className="card-ban-badge ban-semilimited" style={{ position: 'static' }}>
+                                HẠN CHẾ 2
+                              </span>
+                            )}
+                            {card.is_ban_change && card.prev_ban_status && (
+                              <div style={{ fontSize: '0.72rem', color: '#f59e0b', marginTop: 4, fontWeight: 600 }}>
+                                (Từ {card.prev_ban_status})
+                              </div>
+                            )}
+                          </td>
+                          <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                            {isLegacy ? (
+                              <div>
+                                <strong style={{ color: 'var(--text-primary)' }}>Trước năm 2022</strong>
+                                <div style={{ fontSize: '0.75rem', opacity: 0.75 }}>(Banlist cổ điển)</div>
+                              </div>
+                            ) : cardMonth ? (
+                              <div>
+                                <strong style={{ color: 'var(--text-primary)' }}>{formatMonthLabel(cardMonth)}</strong>
+                                {cardDate && (
+                                  <div style={{ fontSize: '0.75rem', opacity: 0.75 }}>
+                                    (Hiệu lực: {formatShortDate(cardDate)})
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              'N/A'
+                            )}
+                          </td>
+                          <td style={{ textAlign: 'right', fontWeight: 700, color: 'var(--success)' }}>
+                            {card.min_price > 0 ? `$${card.min_price.toFixed(2)}` : 'N/A'}
+                          </td>
+                          <td style={{ textAlign: 'center' }}>
+                            <Link
+                              to={`/card/${card.id}`}
+                              className="nav-header-btn"
+                              style={{ padding: '0.35rem 0.65rem', fontSize: '0.8rem', display: 'inline-block' }}
+                            >
+                              Chi tiết
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
 
         {/* Phân trang */}
         <div style={{ marginTop: '2.5rem' }}>

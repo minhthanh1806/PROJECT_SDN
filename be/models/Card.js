@@ -54,6 +54,7 @@ const cardSchema = new mongoose.Schema({
   // Trường tối ưu riêng cho web để tìm kiếm, sắp xếp giá nhanh
   min_price: { type: Number, default: 0, index: true },
   banlist_info: banlistInfoSchema,
+  ban_date: { type: Date, index: true }, // Ngày có hiệu lực bị cấm/giới hạn
   price_updated_at: { type: Date, default: Date.now }
 }, {
   timestamps: true

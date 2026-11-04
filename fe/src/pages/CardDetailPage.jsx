@@ -9,9 +9,7 @@ import {
   ShieldAlert,
   Coins,
   Clock,
-  ExternalLink,
-  Layers,
-  Sparkles
+  Layers
 } from 'lucide-react';
 
 export default function CardDetailPage() {
@@ -92,7 +90,6 @@ export default function CardDetailPage() {
         <Navbar />
         <main className="container" style={{ padding: '4rem 1.25rem', textAlign: 'center' }}>
           <div className="empty-container">
-            <div className="empty-icon">⚠️</div>
             <h2>{error || 'Không tìm thấy thẻ bài'}</h2>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
               Thẻ bài có mã số #{id} không tồn tại hoặc đã bị xóa.
@@ -195,31 +192,26 @@ export default function CardDetailPage() {
               <div className="detail-stats-bar">
                 {card.level !== undefined && (
                   <div className="stat-pill">
-                    <span className="icon-star">⭐</span>
                     <span>Cấp sao: <strong>{card.level}</strong></span>
                   </div>
                 )}
                 {card.atk !== undefined && (
                   <div className="stat-pill">
-                    <span className="icon-atk">⚔️</span>
                     <span>ATK: <strong>{card.atk}</strong></span>
                   </div>
                 )}
                 {card.def !== undefined && (
                   <div className="stat-pill">
-                    <span className="icon-def">🛡️</span>
                     <span>DEF: <strong>{card.def}</strong></span>
                   </div>
                 )}
                 {card.linkval !== undefined && (
                   <div className="stat-pill">
-                    <span style={{ color: '#06b6d4' }}>🔗</span>
                     <span>LINK: <strong>{card.linkval}</strong></span>
                   </div>
                 )}
                 {card.scale !== undefined && (
                   <div className="stat-pill">
-                    <span style={{ color: '#ec4899' }}>💎</span>
                     <span>Scale: <strong>{card.scale}</strong></span>
                   </div>
                 )}
