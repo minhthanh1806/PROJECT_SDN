@@ -24,13 +24,21 @@ export default function HomePage() {
     setLoading(true);
     Promise.all([getCards({ limit: 40 }), getSampleBannedCards()])
       .then(([generalRes, bannedRes]) => {
-        const generalCards = generalRes.data?.success ? generalRes.data.data || [] : [];
-        const bannedCards = bannedRes.data?.success ? bannedRes.data.data || [] : [];
+        const generalCards = generalRes.data?.success && Array.isArray(generalRes.data.data) 
+          ? generalRes.data.data 
+          : [];
 
-        // Gộp chung và loại bỏ trùng lặp theo id thẻ bài
+        const rawBanned = bannedRes.data?.data;
+        const bannedCards = Array.isArray(rawBanned)
+          ? rawBanned
+          : rawBanned && typeof rawBanned === 'object'
+          ? [...(rawBanned.forbidden || []), ...(rawBanned.limited || []), ...(rawBanned.semiLimited || [])]
+          : [];
+
+        // Gộp chung và loại bỏ trùng lặp theo id thẻ bài (loại bỏ thẻ placeholder ???)
         const cardMap = new Map();
         [...generalCards, ...bannedCards].forEach((card) => {
-          if (card && card.id && !cardMap.has(card.id)) {
+          if (card && card.id && card.name !== '???' && !cardMap.has(card.id)) {
             cardMap.set(card.id, card);
           }
         });

@@ -1,15 +1,36 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ShieldAlert, Home, LogIn, LogOut, User, Star } from 'lucide-react';
+import { ShieldAlert, Home, LogIn, LogOut, User, Star, ChevronDown, Layers, ArrowRight, Search, Trophy } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const isBanlist = location.pathname === '/banlist';
+
+  const [decksDropdownOpen, setDecksDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
   const isHome = location.pathname === '/';
+  const isBanlist = location.pathname === '/banlist';
+  const isDecks = location.pathname.startsWith('/decks') || location.pathname.startsWith('/deck/');
   const isProfile = location.pathname === '/profile';
+
+  // Đóng dropdown khi bấm ra ngoài
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDecksDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Đóng dropdown khi chuyển trang
+  useEffect(() => {
+    setDecksDropdownOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
@@ -33,14 +54,93 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Nút điều hướng giữa Trang Chủ, Banlist và Trang cá nhân */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        {/* Nút điều hướng: Trang Chủ, Decks (Dropdown phong cách YGOPRODeck), Banlist và Profile */}
+        <nav style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
           <Link
             to="/"
             className={`nav-header-btn ${isHome ? 'active' : ''}`}
           >
             <Home size={16} /> Trang chủ
           </Link>
+
+          {/* DROPDOWN DECKS (THEO MẪU ẢNH NGƯỜI DÙNG CUNG CẤP) */}
+          <div className="nav-dropdown-wrap" ref={dropdownRef}>
+            <button
+              type="button"
+              className={`nav-header-btn nav-dropdown-btn ${isDecks ? 'active' : ''}`}
+              onClick={() => setDecksDropdownOpen(!decksDropdownOpen)}
+              aria-expanded={decksDropdownOpen}
+            >
+              <Layers size={16} />
+              <span>Decks</span>
+              <ChevronDown
+                size={14}
+                style={{
+                  transform: decksDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s ease'
+                }}
+              />
+            </button>
+
+            {decksDropdownOpen && (
+              <div className="decks-dropdown-menu">
+                {/* 1. Deck Categories */}
+                <Link
+                  to="/decks"
+                  className="dropdown-item-block"
+                  onClick={() => setDecksDropdownOpen(false)}
+                >
+                  <div className="dropdown-item-icon">
+                    <Layers size={18} />
+                  </div>
+                  <div className="dropdown-item-text">
+                    <div className="item-title">
+                      <span>Deck Categories</span>
+                      <ArrowRight size={14} className="arrow-icon" />
+                    </div>
+                    <div className="item-desc">Browse tournament and meta decks</div>
+                  </div>
+                </Link>
+
+                {/* 2. Advanced Deck Search */}
+                <Link
+                  to="/decks?search=advanced"
+                  className="dropdown-item-block"
+                  onClick={() => setDecksDropdownOpen(false)}
+                >
+                  <div className="dropdown-item-icon">
+                    <Search size={18} />
+                  </div>
+                  <div className="dropdown-item-text">
+                    <div className="item-title">
+                      <span>Advanced Deck Search</span>
+                      <ArrowRight size={14} className="arrow-icon" />
+                    </div>
+                    <div className="item-desc">Use advanced filters to search decks</div>
+                  </div>
+                </Link>
+
+                {/* 3. Master Duel Decks */}
+                <Link
+                  to="/decks?format=Master Duel"
+                  className="dropdown-item-block highlight-md"
+                  onClick={() => setDecksDropdownOpen(false)}
+                >
+                  <div className="dropdown-item-icon">
+                    <Trophy size={18} color="#f97316" />
+                  </div>
+                  <div className="dropdown-item-text">
+                    <div className="item-title text-orange">
+                      <span>Master Duel</span>
+                      <ArrowRight size={14} className="arrow-icon" />
+                    </div>
+                    <div className="item-desc">Browse the tier list and decks</div>
+                  </div>
+                </Link>
+              </div>
+            )}
+          </div>
+
           <Link
             to="/banlist"
             className={`nav-header-btn banlist-nav-btn ${isBanlist ? 'active' : ''}`}

@@ -32,6 +32,7 @@ function getYearBadge(monthStr, isLatest) {
 }
 
 export default function BanlistPage() {
+  const [banFormat, setBanFormat] = useState('TCG'); // 'TCG', 'OCG', 'Master Duel'
   const [data, setData] = useState({
     forbidden: [],
     limited: [],
@@ -43,32 +44,26 @@ export default function BanlistPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'forbidden', 'limited', 'semi'
   const [selectedYear, setSelectedYear] = useState('all'); // 'all', '2026', '2025', '2024', '2023', '2022'
-  const [selectedMonth, setSelectedMonth] = useState(''); // Mặc định rỗng = xem tất cả 253 lá hiện tại
-  const [banMode, setBanMode] = useState('changes'); // 'changes' (chỉ lá mới bị phạt đợt đó) | 'full' (toàn bộ banlist đợt đó)
+  const [selectedMonth, setSelectedMonth] = useState(''); // Mặc định rỗng = xem tất cả lá hiện tại
+  const [banMode, setBanMode] = useState('changes'); // 'changes' | 'full'
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' hoặc 'list'
 
-  // Tải dữ liệu từ server theo tháng và chế độ xem
-  const fetchBanlistData = (monthParam = '', modeParam = 'changes') => {
+  // Tải dữ liệu từ server theo format, tháng và chế độ xem
+  const fetchBanlistData = (formatParam = 'TCG', monthParam = '', modeParam = 'changes') => {
     setLoading(true);
-    const params = { format: 'grouped', mode: modeParam };
+    const params = { format: 'grouped', mode: modeParam, ban_format: formatParam };
     if (monthParam) params.month = monthParam;
 
     getSampleBannedCards(params)
       .then((res) => {
         if (res.data?.success) {
-          setData((prev) => ({
+          setData({
             ...res.data.data,
-            monthSummaries:
-              res.data.data.monthSummaries && res.data.data.monthSummaries.length > 0
-                ? res.data.data.monthSummaries
-                : prev.monthSummaries,
-            availableMonths:
-              res.data.data.availableMonths && res.data.data.availableMonths.length > 0
-                ? res.data.data.availableMonths
-                : prev.availableMonths
-          }));
+            monthSummaries: res.data.data.monthSummaries || [],
+            availableMonths: res.data.data.availableMonths || []
+          });
         }
       })
       .catch((err) => console.error('Error fetching banlist:', err))
@@ -76,8 +71,15 @@ export default function BanlistPage() {
   };
 
   useEffect(() => {
-    fetchBanlistData(selectedMonth, banMode);
-  }, [selectedMonth, banMode]);
+    fetchBanlistData(banFormat, selectedMonth, banMode);
+  }, [banFormat, selectedMonth, banMode]);
+
+  const handleFormatChange = (newFormat) => {
+    setBanFormat(newFormat);
+    setSelectedMonth('');
+    setSelectedYear('all');
+    setCurrentPage(1);
+  };
 
   // Lọc danh sách các tháng hiển thị trên thanh Timeline theo Năm đang chọn
   const visibleMonthSummaries = useMemo(() => {
@@ -154,14 +156,49 @@ export default function BanlistPage() {
       <Navbar />
 
       <main className="container" style={{ padding: '2rem 1.25rem 3rem' }}>
-        {/* Tiêu đề trang */}
+        {/* Tiêu đề trang & Chọn Format Banlist: TCG, OCG, Master Duel */}
         <div style={{ maxWidth: '1100px', margin: '0 auto 1.5rem' }}>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '0 0 0.4rem' }}>
-            Lịch Sử Banlist TCG Theo Tháng (2022 - 2026)
-          </h1>
-          <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '0.95rem' }}>
-            Đồng bộ dữ liệu từ <strong>YGOPRODeck Banlist</strong> (18 đợt cập nhật từ tháng 02/2022 đến tháng 10/2026). Nhấn vào từng tháng để xem các lá bài bị phạt hoặc toàn bộ danh sách hiệu lực.
-          </p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '0.75rem' }}>
+            <div>
+              <h1 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '0 0 0.4rem' }}>
+                Lịch Sử Banlist {banFormat} (2022 - 2026)
+              </h1>
+              <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '0.95rem' }}>
+                Đồng bộ dữ liệu chính thức từ <strong>YGOPRODeck Banlist ({banFormat})</strong>. Chọn Format bên dưới để tra cứu chi tiết.
+              </p>
+            </div>
+
+            {/* TAB CHUYỂN ĐỔI FORMAT: TCG, OCG, MASTER DUEL */}
+            <div style={{ display: 'flex', gap: '0.5rem', background: 'var(--bg-secondary)', padding: '4px', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+              {[
+                { id: 'TCG', label: 'TCG Banlist', color: '#3b82f6' },
+                { id: 'OCG', label: 'OCG Banlist', color: '#ef4444' },
+                { id: 'Master Duel', label: 'Master Duel Banlist', color: '#f97316' }
+              ].map((fmt) => {
+                const isActive = banFormat === fmt.id;
+                return (
+                  <button
+                    key={fmt.id}
+                    type="button"
+                    onClick={() => handleFormatChange(fmt.id)}
+                    style={{
+                      padding: '0.55rem 1.15rem',
+                      borderRadius: '8px',
+                      border: 'none',
+                      background: isActive ? fmt.color : 'transparent',
+                      color: isActive ? '#ffffff' : 'var(--text-secondary)',
+                      fontSize: '0.9rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    {fmt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
         {/* ============================================================
@@ -241,9 +278,9 @@ export default function BanlistPage() {
                   onClick={() => handleMonthSelect('')}
                   className="nav-header-btn"
                   style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
-                  title="Xem lại toàn bộ 253 lá bài hiện hành"
+                  title="Xem lại toàn bộ lá bài hiện hành"
                 >
-                  Xem hiện tại (253 lá)
+                  Xem toàn bộ {banFormat}
                 </button>
               )}
             </div>
@@ -261,13 +298,13 @@ export default function BanlistPage() {
                 Banlist Hiện Hành
               </span>
               <span className="timeline-wave-date" style={{ fontSize: '1.05rem' }}>
-                Tất Cả (253 Lá)
+                Tất Cả {banFormat} ({data.stats?.totalCount || 0} Lá)
               </span>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                155 Cấm • 91 Hạn chế 1 • 7 Hạn chế 2
+                {data.stats?.forbiddenCount || 0} Cấm • {data.stats?.limitedCount || 0} Hạn chế 1 • {data.stats?.semiLimitedCount || 0} Hạn chế 2
               </span>
               <span className="timeline-wave-count">
-                Toàn bộ TCG Banlist
+                Toàn bộ {banFormat} Banlist
               </span>
             </button>
 
