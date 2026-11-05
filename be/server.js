@@ -7,6 +7,7 @@ require('dotenv').config();
 const connectDB = require('./config/db');
 const cardRoutes = require('./routes/cardRoutes');
 const authRoutes = require('./routes/authRoutes');
+const deckRoutes = require('./routes/deckRoutes');
 const { serveCardImage } = require('./controllers/cardController');
 const { syncCardData } = require('./scripts/syncCards');
 
@@ -27,6 +28,7 @@ app.get('/images/cards/:filename', serveCardImage);
 // 4. API Routes
 app.use('/api/cards', cardRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/decks', deckRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {

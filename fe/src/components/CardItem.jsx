@@ -68,18 +68,6 @@ export default function CardItem({ card, onFavoriteChange }) {
             <Star size={16} fill={isFavorited ? '#fbbf24' : 'none'} color={isFavorited ? '#fbbf24' : '#ffffff'} />
           </button>
 
-          {/* Huy hiệu trạng thái Banlist */}
-          {card.banlist_info?.ban_tcg && card.banlist_info.ban_tcg !== 'Unlimited' && (
-            <span
-              className={`card-ban-badge ban-${card.banlist_info.ban_tcg.toLowerCase().replace(/[^a-z]/g, '')}`}
-              title={`Banlist TCG: ${card.banlist_info.ban_tcg}`}
-            >
-              {card.banlist_info.ban_tcg === 'Forbidden' && 'CẤM'}
-              {card.banlist_info.ban_tcg === 'Limited' && 'GIỚI HẠN 1'}
-              {card.banlist_info.ban_tcg === 'Semi-Limited' && 'GIỚI HẠN 2'}
-            </span>
-          )}
-
           {card.level !== undefined && (
             <span className="card-level-badge">⭐ {card.level}</span>
           )}
