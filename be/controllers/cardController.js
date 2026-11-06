@@ -158,14 +158,11 @@ exports.getCardById = async (req, res) => {
 
 // Đọc dữ liệu lịch sử Banlist chính thức từ YGOPRODeck (TCG, OCG, Master Duel)
 const allBanlistsPath = path.join(__dirname, '../data/ygoprodeck_all_banlists.json');
-const tcgBanlistPath = path.join(__dirname, '../data/ygoprodeck_tcg_banlists.json');
 let ALL_BANLISTS = { TCG: {}, OCG: {}, 'Master Duel': {} };
 
 try {
   if (fs.existsSync(allBanlistsPath)) {
     ALL_BANLISTS = JSON.parse(fs.readFileSync(allBanlistsPath, 'utf8'));
-  } else if (fs.existsSync(tcgBanlistPath)) {
-    ALL_BANLISTS.TCG = JSON.parse(fs.readFileSync(tcgBanlistPath, 'utf8'));
   }
 } catch (err) {
   console.error('[Load ygoprodeck_all_banlists.json error]', err);

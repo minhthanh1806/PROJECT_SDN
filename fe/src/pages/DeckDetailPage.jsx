@@ -5,18 +5,15 @@ import { getDeckById, likeDeck } from '../services/api';
 import {
   ArrowLeft,
   Layers,
-  DollarSign,
   Trophy,
   Download,
   Copy,
   Check,
   Heart,
   Eye,
-  Calendar,
   Sparkles,
   ExternalLink,
-  ShieldAlert,
-  AlertTriangle
+  ShieldAlert
 } from 'lucide-react';
 
 export default function DeckDetailPage() {
@@ -167,9 +164,6 @@ export default function DeckDetailPage() {
   });
   const spells = (deck.main_deck || []).filter((c) => (c.card_type || '').toLowerCase().includes('spell'));
   const traps = (deck.main_deck || []).filter((c) => (c.card_type || '').toLowerCase().includes('trap'));
-
-  const bannedCards = deck.banned_cards || [];
-  const banSummary = deck.ban_summary || { forbidden_count: 0, limited_count: 0, semi_limited_count: 0, total_banned_unique: 0 };
 
   return (
     <div className="app-shell">
