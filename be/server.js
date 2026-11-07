@@ -8,6 +8,7 @@ const connectDB = require('./config/db');
 const cardRoutes = require('./routes/cardRoutes');
 const authRoutes = require('./routes/authRoutes');
 const deckRoutes = require('./routes/deckRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const { serveCardImage } = require('./controllers/cardController');
 const { syncCardData } = require('./scripts/syncCards');
 
@@ -29,6 +30,7 @@ app.get('/images/cards/:filename', serveCardImage);
 app.use('/api/cards', cardRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/decks', deckRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {

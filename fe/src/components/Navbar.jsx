@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ShieldAlert, Home, LogIn, LogOut, User, Star, ChevronDown, Layers, ArrowRight, Search, Trophy } from 'lucide-react';
+import { ShieldAlert, Home, LogIn, LogOut, User, Star, ChevronDown, Layers, ArrowRight, Search, Trophy, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, isAdmin, logout } = useAuth();
 
   const [decksDropdownOpen, setDecksDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -15,6 +15,7 @@ export default function Navbar() {
   const isBanlist = location.pathname === '/banlist';
   const isDecks = location.pathname.startsWith('/decks') || location.pathname.startsWith('/deck/');
   const isProfile = location.pathname === '/profile';
+  const isAdminPage = location.pathname.startsWith('/admin');
 
   // Đóng dropdown khi bấm ra ngoài
   useEffect(() => {
@@ -147,6 +148,17 @@ export default function Navbar() {
           >
             <ShieldAlert size={16} /> Xem Banlist
           </Link>
+
+          {/* NÚT DÀNH RIÊNG CHO QUẢN TRỊ VIÊN */}
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className={`nav-header-btn nav-admin-btn ${isAdminPage ? 'active' : ''}`}
+              title="Bảng điều khiển Quản trị viên"
+            >
+              <ShieldCheck size={16} color="#38bdf8" /> Quản trị
+            </Link>
+          )}
 
           {user ? (
             <>

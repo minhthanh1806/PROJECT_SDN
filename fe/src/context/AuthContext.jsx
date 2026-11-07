@@ -49,8 +49,10 @@ export function AuthProvider({ children }) {
     return user.favorites.includes(Number(cardId));
   };
 
+  const isAdmin = user?.role === 'admin';
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, toggleFavorite, isCardFavorited }}>
+    <AuthContext.Provider value={{ user, isAdmin, login, logout, toggleFavorite, isCardFavorited }}>
       {children}
     </AuthContext.Provider>
   );

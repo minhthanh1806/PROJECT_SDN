@@ -33,12 +33,12 @@ exports.register = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Tên đăng nhập đã tồn tại' });
     }
 
-    const user = await User.create({ username, password: hashPassword(password), favorites: [] });
+    const user = await User.create({ username, password: hashPassword(password), role: 'user', favorites: [] });
 
     return res.status(201).json({
       success: true,
       message: 'Đăng ký thành công',
-      data: { id: user._id, username: user.username, createdAt: user.createdAt, favorites: [] }
+      data: { id: user._id, username: user.username, role: user.role, createdAt: user.createdAt, favorites: [] }
     });
   } catch (error) {
     console.error('[register error]', error);
@@ -67,6 +67,7 @@ exports.login = async (req, res) => {
       data: {
         id: user._id,
         username: user.username,
+        role: user.role || 'user',
         createdAt: user.createdAt,
         favorites: user.favorites || []
       }
@@ -98,6 +99,7 @@ exports.getProfile = async (req, res) => {
       data: {
         id: user._id,
         username: user.username,
+        role: user.role || 'user',
         createdAt: user.createdAt,
         favorites: user.favorites || [],
         favoriteCards,
