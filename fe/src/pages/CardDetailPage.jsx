@@ -309,16 +309,37 @@ export default function CardDetailPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {sets.map((s, idx) => (
-                          <tr key={`${s.set_code}-${idx}`}>
-                            <td><strong>{s.set_name}</strong></td>
-                            <td><span className="set-code-badge">{s.set_code}</span></td>
-                            <td>{s.set_rarity} {s.set_rarity_code || ''}</td>
-                            <td style={{ textAlign: 'right', fontWeight: 700, color: 'var(--success)' }}>
-                              {s.set_price > 0 ? `$${Number(s.set_price).toFixed(2)}` : 'N/A'}
-                            </td>
-                          </tr>
-                        ))}
+                        {sets.map((s, idx) => {
+                          const setPriceNum = parseFloat(s.set_price);
+                          const hasSetPrice = !isNaN(setPriceNum) && setPriceNum > 0;
+                          const fallbackPrice = card.min_price > 0 ? card.min_price : null;
+
+                          return (
+                            <tr key={`${s.set_code}-${idx}`}>
+                              <td><strong>{s.set_name}</strong></td>
+                              <td><span className="set-code-badge">{s.set_code}</span></td>
+                              <td>{s.set_rarity} {s.set_rarity_code || ''}</td>
+                              <td style={{ textAlign: 'right' }}>
+                                {hasSetPrice ? (
+                                  <span style={{ fontWeight: 700, color: 'var(--success)' }}>
+                                    ${setPriceNum.toFixed(2)}
+                                  </span>
+                                ) : fallbackPrice ? (
+                                  <span
+                                    style={{ fontWeight: 700, color: '#0ea5e9' }}
+                                    title="Giá ước tính theo giá thị trường thấp nhất của lá bài này"
+                                  >
+                                    ~${fallbackPrice.toFixed(2)}
+                                  </span>
+                                ) : (
+                                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                                    Chưa có giá
+                                  </span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
