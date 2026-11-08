@@ -647,8 +647,16 @@ export default function BanlistPage() {
                               'N/A'
                             )}
                           </td>
-                          <td style={{ textAlign: 'right', fontWeight: 700, color: 'var(--success)' }}>
-                            {card.min_price > 0 ? `$${card.min_price.toFixed(2)}` : 'N/A'}
+                          <td style={{ textAlign: 'right' }}>
+                            {card.min_price > 0 ? (
+                              <span style={{ fontWeight: 700, color: 'var(--success)' }}>
+                                ${card.min_price.toFixed(2)}
+                              </span>
+                            ) : (
+                              <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                                Chưa có giá
+                              </span>
+                            )}
                           </td>
                           <td style={{ textAlign: 'center' }}>
                             <Link

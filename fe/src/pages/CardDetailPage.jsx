@@ -245,46 +245,46 @@ export default function CardDetailPage() {
 
               <div className="price-grid-5">
                 {/* 1. Cardmarket (€) */}
-                <div className="price-card">
+                <div className={`price-card ${!prices.cardmarket_price || Number(prices.cardmarket_price) <= 0 ? 'is-out-of-stock' : ''}`}>
                   <div className="price-source-name">Cardmarket</div>
-                  <div className="price-tag-amount">
-                    {prices.cardmarket_price ? `€${Number(prices.cardmarket_price).toFixed(2)}` : 'N/A'}
+                  <div className={`price-tag-amount ${!prices.cardmarket_price || Number(prices.cardmarket_price) <= 0 ? 'is-na' : ''}`}>
+                    {prices.cardmarket_price && Number(prices.cardmarket_price) > 0 ? `€${Number(prices.cardmarket_price).toFixed(2)}` : 'Chưa có hàng'}
                   </div>
                   <div className="price-region">Châu Âu (Euro)</div>
                 </div>
 
                 {/* 2. TCGplayer ($) */}
-                <div className="price-card">
+                <div className={`price-card ${!prices.tcgplayer_price || Number(prices.tcgplayer_price) <= 0 ? 'is-out-of-stock' : ''}`}>
                   <div className="price-source-name">TCGplayer</div>
-                  <div className="price-tag-amount">
-                    {prices.tcgplayer_price ? `$${Number(prices.tcgplayer_price).toFixed(2)}` : 'N/A'}
+                  <div className={`price-tag-amount ${!prices.tcgplayer_price || Number(prices.tcgplayer_price) <= 0 ? 'is-na' : ''}`}>
+                    {prices.tcgplayer_price && Number(prices.tcgplayer_price) > 0 ? `$${Number(prices.tcgplayer_price).toFixed(2)}` : 'Chưa có hàng'}
                   </div>
                   <div className="price-region">Bắc Mỹ (USD)</div>
                 </div>
 
                 {/* 3. eBay ($) */}
-                <div className="price-card">
+                <div className={`price-card ${!prices.ebay_price || Number(prices.ebay_price) <= 0 ? 'is-out-of-stock' : ''}`}>
                   <div className="price-source-name">eBay</div>
-                  <div className="price-tag-amount">
-                    {prices.ebay_price ? `$${Number(prices.ebay_price).toFixed(2)}` : 'N/A'}
+                  <div className={`price-tag-amount ${!prices.ebay_price || Number(prices.ebay_price) <= 0 ? 'is-na' : ''}`}>
+                    {prices.ebay_price && Number(prices.ebay_price) > 0 ? `$${Number(prices.ebay_price).toFixed(2)}` : 'Chưa có hàng'}
                   </div>
                   <div className="price-region">Quốc tế (USD)</div>
                 </div>
 
                 {/* 4. Amazon ($) */}
-                <div className="price-card">
+                <div className={`price-card ${!prices.amazon_price || Number(prices.amazon_price) <= 0 ? 'is-out-of-stock' : ''}`}>
                   <div className="price-source-name">Amazon</div>
-                  <div className="price-tag-amount">
-                    {prices.amazon_price ? `$${Number(prices.amazon_price).toFixed(2)}` : 'N/A'}
+                  <div className={`price-tag-amount ${!prices.amazon_price || Number(prices.amazon_price) <= 0 ? 'is-na' : ''}`}>
+                    {prices.amazon_price && Number(prices.amazon_price) > 0 ? `$${Number(prices.amazon_price).toFixed(2)}` : 'Chưa có hàng'}
                   </div>
                   <div className="price-region">Quốc tế (USD)</div>
                 </div>
 
                 {/* 5. CoolStuffInc ($) */}
-                <div className="price-card">
+                <div className={`price-card ${!prices.coolstuffinc_price || Number(prices.coolstuffinc_price) <= 0 ? 'is-out-of-stock' : ''}`}>
                   <div className="price-source-name">CoolStuffInc</div>
-                  <div className="price-tag-amount">
-                    {prices.coolstuffinc_price ? `$${Number(prices.coolstuffinc_price).toFixed(2)}` : 'N/A'}
+                  <div className={`price-tag-amount ${!prices.coolstuffinc_price || Number(prices.coolstuffinc_price) <= 0 ? 'is-na' : ''}`}>
+                    {prices.coolstuffinc_price && Number(prices.coolstuffinc_price) > 0 ? `$${Number(prices.coolstuffinc_price).toFixed(2)}` : 'Chưa có hàng'}
                   </div>
                   <div className="price-region">Bắc Mỹ (USD)</div>
                 </div>

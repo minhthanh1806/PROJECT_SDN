@@ -19,14 +19,18 @@ import {
 export default function DecksPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Query state từ URL
-  const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
-  const [selectedFormat, setSelectedFormat] = useState(searchParams.get('format') || '');
-  const [selectedArchetype, setSelectedArchetype] = useState(searchParams.get('archetype') || '');
-  const [priceMax, setPriceMax] = useState(searchParams.get('price_max') || '');
-  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
-  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1', 10));
+  // Đọc trực tiếp các giá trị bộ lọc từ URL (Single source of truth, chống loop re-render)
+  const searchTerm = searchParams.get('q') || '';
+  const selectedCategory = searchParams.get('category') || '';
+  const selectedFormat = searchParams.get('format') || '';
+  const selectedArchetype = searchParams.get('archetype') || '';
+  const priceMax = searchParams.get('price_max') || '';
+  const sortBy = searchParams.get('sort') || 'newest';
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
+  const showAdvanced = searchParams.get('search') === 'advanced';
+
+  // State cục bộ cho ô input search để gõ phím mượt mà
+  const [searchInput, setSearchInput] = useState(searchTerm);
 
   // Data state
   const [decks, setDecks] = useState([]);
@@ -34,8 +38,10 @@ export default function DecksPage() {
   const [pagination, setPagination] = useState({ totalDecks: 0, totalPages: 1, currentPage: 1 });
   const [loading, setLoading] = useState(true);
 
-  // Hiển thị khung Advanced Search nếu có param ?search=advanced
-  const [showAdvanced, setShowAdvanced] = useState(searchParams.get('search') === 'advanced');
+  // Khi search term trong URL đổi (vd back/forward hoặc reset), đồng bộ lại input
+  useEffect(() => {
+    setSearchInput(searchTerm);
+  }, [searchTerm]);
 
   // Load Metadata (Categories, Formats, Archetypes)
   useEffect(() => {
@@ -48,34 +54,32 @@ export default function DecksPage() {
       .catch((err) => console.error('Error fetching deck meta:', err));
   }, []);
 
-  // Lắng nghe URL thay đổi (khi bấm link Navbar hoặc Back/Forward)
-  useEffect(() => {
-    const isAdv = searchParams.get('search') === 'advanced';
-    if (isAdv) setShowAdvanced(true);
-    const cat = searchParams.get('category');
-    if (cat !== null) setSelectedCategory(cat);
-    const fmt = searchParams.get('format');
-    if (fmt !== null) setSelectedFormat(fmt);
-    const q = searchParams.get('q');
-    if (q !== null) setSearchTerm(q);
-  }, [searchParams]);
+  // Cập nhật URLSearchParams một cách nhất quán
+  const updateUrl = (patch) => {
+    const current = {
+      q: searchTerm,
+      category: selectedCategory,
+      format: selectedFormat,
+      archetype: selectedArchetype,
+      price_max: priceMax,
+      sort: sortBy,
+      page: currentPage,
+      search: showAdvanced ? 'advanced' : '',
+      ...patch
+    };
 
-  // Đồng bộ param URL khi người dùng thay đổi bộ lọc (chỉ ghi đè nếu URL thực sự thay đổi)
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (searchTerm) params.set('q', searchTerm);
-    if (selectedCategory) params.set('category', selectedCategory);
-    if (selectedFormat) params.set('format', selectedFormat);
-    if (selectedArchetype) params.set('archetype', selectedArchetype);
-    if (priceMax) params.set('price_max', priceMax);
-    if (sortBy && sortBy !== 'newest') params.set('sort', sortBy);
-    if (currentPage > 1) params.set('page', String(currentPage));
-    if (showAdvanced) params.set('search', 'advanced');
+    const next = new URLSearchParams();
+    if (current.q) next.set('q', current.q);
+    if (current.category) next.set('category', current.category);
+    if (current.format) next.set('format', current.format);
+    if (current.archetype) next.set('archetype', current.archetype);
+    if (current.price_max) next.set('price_max', current.price_max);
+    if (current.sort && current.sort !== 'newest') next.set('sort', current.sort);
+    if (current.page && current.page > 1) next.set('page', String(current.page));
+    if (current.search === 'advanced') next.set('search', 'advanced');
 
-    if (params.toString() !== searchParams.toString()) {
-      setSearchParams(params, { replace: true });
-    }
-  }, [searchTerm, selectedCategory, selectedFormat, selectedArchetype, priceMax, sortBy, currentPage, showAdvanced]);
+    setSearchParams(next);
+  };
 
   // Gọi API lấy danh sách Decks
   const fetchDecksData = () => {
@@ -107,13 +111,14 @@ export default function DecksPage() {
   }, [searchTerm, selectedCategory, selectedFormat, selectedArchetype, priceMax, sortBy, currentPage]);
 
   const handleResetFilters = () => {
-    setSearchTerm('');
-    setSelectedCategory('');
-    setSelectedFormat('');
-    setSelectedArchetype('');
-    setPriceMax('');
-    setSortBy('newest');
-    setCurrentPage(1);
+    setSearchInput('');
+    setSearchParams(showAdvanced ? { search: 'advanced' } : {});
+  };
+
+  const handleSearchSubmit = (e) => {
+    if (e.key === 'Enter') {
+      updateUrl({ q: searchInput, page: 1 });
+    }
   };
 
   // Danh mục dùng cho bộ lọc nâng cao
@@ -158,18 +163,19 @@ export default function DecksPage() {
                 <Search size={18} className="search-icon" />
                 <input
                   type="text"
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  placeholder="Tìm kiếm deck theo tên, archetype (Tenpai, Snake-Eye, Kashtira, Purrely...)"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={handleSearchSubmit}
+                  placeholder="Tìm kiếm deck theo tên, archetype (nhấn Enter để tìm)..."
                   className="decks-search-input"
                 />
-                {searchTerm && (
+                {searchInput && (
                   <button
                     type="button"
-                    onClick={() => setSearchTerm('')}
+                    onClick={() => {
+                      setSearchInput('');
+                      updateUrl({ q: '', page: 1 });
+                    }}
                     className="clear-btn"
                   >
                     ✕
@@ -180,7 +186,7 @@ export default function DecksPage() {
               <button
                 type="button"
                 className={`advanced-toggle-btn ${showAdvanced ? 'active' : ''}`}
-                onClick={() => setShowAdvanced(!showAdvanced)}
+                onClick={() => updateUrl({ search: showAdvanced ? '' : 'advanced' })}
               >
                 <Filter size={16} />
                 <span>Bộ lọc nâng cao</span>
@@ -212,10 +218,7 @@ export default function DecksPage() {
                 <label className="filter-field-label">Danh mục (Category)</label>
                 <select
                   value={selectedCategory}
-                  onChange={(e) => {
-                    setSelectedCategory(e.target.value);
-                    setCurrentPage(1);
-                  }}
+                  onChange={(e) => updateUrl({ category: e.target.value, page: 1 })}
                   className="filter-select-inline"
                 >
                   {categoriesList.map((c) => (
@@ -231,10 +234,7 @@ export default function DecksPage() {
                 <label className="filter-field-label">Format thi đấu</label>
                 <select
                   value={selectedFormat}
-                  onChange={(e) => {
-                    setSelectedFormat(e.target.value);
-                    setCurrentPage(1);
-                  }}
+                  onChange={(e) => updateUrl({ format: e.target.value, page: 1 })}
                   className="filter-select-inline"
                 >
                   <option value="">Tất cả format</option>
@@ -251,10 +251,7 @@ export default function DecksPage() {
                 <label className="filter-field-label">Archetype</label>
                 <select
                   value={selectedArchetype}
-                  onChange={(e) => {
-                    setSelectedArchetype(e.target.value);
-                    setCurrentPage(1);
-                  }}
+                  onChange={(e) => updateUrl({ archetype: e.target.value, page: 1 })}
                   className="filter-select-inline"
                 >
                   <option value="">Tất cả Archetypes</option>
@@ -271,10 +268,7 @@ export default function DecksPage() {
                 <label className="filter-field-label">Giá tối đa ($)</label>
                 <select
                   value={priceMax}
-                  onChange={(e) => {
-                    setPriceMax(e.target.value);
-                    setCurrentPage(1);
-                  }}
+                  onChange={(e) => updateUrl({ price_max: e.target.value, page: 1 })}
                   className="filter-select-inline"
                 >
                   <option value="">Mọi mức giá</option>
@@ -302,13 +296,10 @@ export default function DecksPage() {
                   type="button"
                   onClick={() => {
                     if (item.isCategory) {
-                      setSelectedCategory(item.id);
-                      setSelectedFormat('');
+                      updateUrl({ category: item.id, format: '', page: 1 });
                     } else {
-                      setSelectedFormat(item.id);
-                      setSelectedCategory('');
+                      updateUrl({ format: item.id, category: '', page: 1 });
                     }
-                    setCurrentPage(1);
                   }}
                   className={`category-chip-btn ${isActive ? 'active' : ''}`}
                 >
@@ -326,10 +317,7 @@ export default function DecksPage() {
             <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Sắp xếp:</span>
             <select
               value={sortBy}
-              onChange={(e) => {
-                setSortBy(e.target.value);
-                setCurrentPage(1);
-              }}
+              onChange={(e) => updateUrl({ sort: e.target.value, page: 1 })}
               className="decks-sort-select"
             >
               <option value="newest">Mới nhất</option>
@@ -452,7 +440,7 @@ export default function DecksPage() {
               currentPage={currentPage}
               totalPages={pagination.totalPages}
               onPageChange={(page) => {
-                setCurrentPage(page);
+                updateUrl({ page });
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
             />

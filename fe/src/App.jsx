@@ -9,23 +9,26 @@ import ProfilePage from './pages/ProfilePage';
 import CardDetailPage from './pages/CardDetailPage';
 import AdminPage from './pages/AdminPage';
 import { AuthProvider } from './context/AuthContext';
+import ErrorBoundary from './components/ErrorBoundary';
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/card/:id" element={<CardDetailPage />} />
-          <Route path="/decks" element={<DecksPage />} />
-          <Route path="/deck/:id" element={<DeckDetailPage />} />
-          <Route path="/banlist" element={<BanlistPage />} />
-          <Route path="/login" element={<AuthPage mode="login" />} />
-          <Route path="/register" element={<AuthPage mode="register" />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/admin" element={<AdminPage />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/card/:id" element={<CardDetailPage />} />
+            <Route path="/decks" element={<DecksPage />} />
+            <Route path="/deck/:id" element={<DeckDetailPage />} />
+            <Route path="/banlist" element={<BanlistPage />} />
+            <Route path="/login" element={<AuthPage mode="login" />} />
+            <Route path="/register" element={<AuthPage mode="register" />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/admin" element={<AdminPage />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }

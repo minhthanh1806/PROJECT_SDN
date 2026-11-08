@@ -105,8 +105,8 @@ export default function CardItem({ card, onFavoriteChange }) {
           {/* Lowest Price */}
           <div className="card-price-bottom">
             <span className="price-label">Giá thấp nhất:</span>
-            <span className="price-value">
-              {minPrice > 0 ? `$${minPrice.toFixed(2)}` : 'N/A'}
+            <span className={`price-value ${minPrice > 0 ? '' : 'is-na'}`}>
+              {minPrice > 0 ? `$${minPrice.toFixed(2)}` : 'Chưa có giá'}
             </span>
           </div>
         </div>

@@ -305,8 +305,8 @@ export default function DeckDetailPage() {
                 <h4 className="preview-card-name">{selectedCard.name}</h4>
                 <div className="preview-card-meta">
                   <span>{selectedCard.card_type}</span>
-                  <span className="preview-price-tag">
-                    {selectedCard.price > 0 ? `$${selectedCard.price.toFixed(2)}` : 'N/A'}
+                  <span className={`preview-price-tag ${selectedCard.price > 0 ? '' : 'is-na'}`}>
+                    {selectedCard.price > 0 ? `$${selectedCard.price.toFixed(2)}` : 'Chưa có giá'}
                   </span>
                 </div>
                 <Link
