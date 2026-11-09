@@ -254,7 +254,7 @@ export default function DeckDetailPage() {
           {/* THANH THỐNG KÊ CHI TIẾT MAIN / EXTRA / SIDE */}
           <div className="deck-stats-strip">
             <div className="stat-strip-item">
-              <span className="stat-num">{deck.stats?.main_count || 40}</span>
+              <span className="stat-num">{deck.stats?.main_count ?? 0}</span>
               <span className="stat-lbl">Main Deck</span>
             </div>
             <div className="stat-strip-item">
@@ -333,7 +333,7 @@ export default function DeckDetailPage() {
               <div className="deck-section-header">
                 <div className="section-title">
                   <Layers size={18} color="var(--primary)" />
-                  <span>Main Deck ({deck.stats?.main_count || 40} lá)</span>
+                  <span>Main Deck ({deck.stats?.main_count ?? 0} lá)</span>
                 </div>
                 <div className="section-counts-breakdown">
                   <span>Monster: {deck.stats?.monster_count || 0}</span>
@@ -343,6 +343,22 @@ export default function DeckDetailPage() {
                   <span>Trap: {deck.stats?.trap_count || 0}</span>
                 </div>
               </div>
+
+              {/* Thông báo nếu chưa có lá bài nào trong Main Deck */}
+              {monsters.length === 0 && spells.length === 0 && traps.length === 0 && (
+                <div style={{ padding: '3rem 1.5rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                  <Layers size={40} style={{ margin: '0 auto 0.75rem', opacity: 0.5 }} />
+                  <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1.05rem', marginBottom: '0.4rem' }}>
+                    Bộ bài này chưa có lá bài nào trong Main Deck
+                  </div>
+                  <div style={{ fontSize: '0.88rem', maxWidth: '420px', margin: '0 auto 1.25rem' }}>
+                    Bộ bài vừa được tạo mới hoặc chưa cập nhật danh sách thẻ bài. Bạn có thể thêm thẻ bằng cách chỉnh sửa bộ bài trong trang Quản Trị.
+                  </div>
+                  <Link to="/admin" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
+                    Đi đến trang Quản Trị (Admin)
+                  </Link>
+                </div>
+              )}
 
               {/* Danh sách quái thú */}
               {monsters.length > 0 && (

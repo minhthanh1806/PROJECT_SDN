@@ -3157,6 +3157,53 @@ button.nav-header-btn {
   overflow: hidden;
 }
 
+.admin-modal-card.modal-lg {
+  max-width: 800px;
+  max-height: 90vh;
+}
+
+.deck-cards-manager-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.15rem;
+  margin-top: 0.5rem;
+}
+
+.manager-tab-btn {
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.manager-tab-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--primary);
+}
+
+.manager-tab-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.modal-card-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0.6rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 0.35rem;
+}
+
 .admin-modal-header {
   display: flex;
   justify-content: space-between;

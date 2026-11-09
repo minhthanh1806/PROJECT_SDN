@@ -406,7 +406,7 @@ export default function DecksPage() {
                     {/* Thanh thống kê số thẻ: Main, Extra, Side */}
                     <div className="deck-counts-bar">
                       <div className="count-pill">
-                        Main: <strong>{deck.stats?.main_count || 40}</strong>
+                        Main: <strong>{deck.stats?.main_count ?? 0}</strong>
                       </div>
                       <div className="count-pill">
                         Extra: <strong>{deck.stats?.extra_count || 0}</strong>

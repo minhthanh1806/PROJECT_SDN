@@ -13,7 +13,8 @@ import {
   updateCardPrice,
   getAdminUsers,
   updateUserRole,
-  deleteUser
+  deleteUser,
+  getCards
 } from '../services/api';
 import {
   ShieldCheck,
@@ -69,9 +70,16 @@ export default function AdminPage() {
     author: 'Admin',
     tournament: '',
     description: '',
-    is_featured: false
+    is_featured: false,
+    main_deck: [],
+    extra_deck: [],
+    side_deck: []
   });
   const [deckSubmitting, setDeckSubmitting] = useState(false);
+  const [modalCardSearch, setModalCardSearch] = useState('');
+  const [modalCardResults, setModalCardResults] = useState([]);
+  const [modalSearchLoading, setModalSearchLoading] = useState(false);
+  const [deckViewSection, setDeckViewSection] = useState('main_deck'); // 'main_deck', 'extra_deck', 'side_deck'
 
   // Cards Management
   const [cards, setCards] = useState([]);
@@ -208,7 +216,10 @@ export default function AdminPage() {
         author: deck.author || 'Admin',
         tournament: deck.tournament || '',
         description: deck.description || '',
-        is_featured: !!deck.is_featured
+        is_featured: !!deck.is_featured,
+        main_deck: deck.main_deck ? JSON.parse(JSON.stringify(deck.main_deck)) : [],
+        extra_deck: deck.extra_deck ? JSON.parse(JSON.stringify(deck.extra_deck)) : [],
+        side_deck: deck.side_deck ? JSON.parse(JSON.stringify(deck.side_deck)) : []
       });
     } else {
       setEditingDeck(null);
@@ -220,10 +231,128 @@ export default function AdminPage() {
         author: user?.username || 'Admin',
         tournament: '',
         description: '',
-        is_featured: false
+        is_featured: false,
+        main_deck: [],
+        extra_deck: [],
+        side_deck: []
       });
     }
+    setModalCardSearch('');
+    setModalCardResults([]);
+    setDeckViewSection('main_deck');
     setDeckModalOpen(true);
+  };
+
+  // Tìm kiếm lá bài để thêm vào Deck Modal
+  const handleSearchModalCards = async (term) => {
+    setModalCardSearch(term);
+    if (!term || term.trim().length < 2) {
+      setModalCardResults([]);
+      return;
+    }
+    setModalSearchLoading(true);
+    try {
+      const res = await getCards({ fname: term.trim(), limit: 8 });
+      if (res.data?.success && Array.isArray(res.data.data)) {
+        setModalCardResults(res.data.data);
+      }
+    } catch (err) {
+      console.error('Error search modal cards:', err);
+    } finally {
+      setModalSearchLoading(false);
+    }
+  };
+
+  // Thêm lá bài vào Main / Extra / Side
+  const handleAddCardToDeck = (card, section = 'main_deck', qty = 1) => {
+    const list = [...(deckFormData[section] || [])];
+    const existingIndex = list.findIndex(c => String(c.card_id) === String(card.id));
+    if (existingIndex >= 0) {
+      const currentQty = list[existingIndex].quantity || 1;
+      list[existingIndex].quantity = Math.min(3, currentQty + qty);
+    } else {
+      list.push({
+        card_id: card.id,
+        name: card.name,
+        quantity: Math.min(3, qty),
+        card_type: card.type || 'Monster',
+        image_url: card.card_images?.[0]?.image_url || `https://images.ygoprodeck.com/images/cards/${card.id}.jpg`,
+        image_url_small: card.card_images?.[0]?.image_url_small || `/images/cards/${card.id}_small.jpg`,
+        price: card.min_price || 0
+      });
+    }
+    setDeckFormData({ ...deckFormData, [section]: list });
+    showToast('success', `Đã thêm ${card.name} vào ${section === 'main_deck' ? 'Main' : section === 'extra_deck' ? 'Extra' : 'Side'} Deck!`);
+  };
+
+  // Thay đổi số lượng thẻ (+1 / -1)
+  const handleUpdateCardQty = (section, cardId, delta) => {
+    let list = [...(deckFormData[section] || [])];
+    const idx = list.findIndex(c => String(c.card_id) === String(cardId));
+    if (idx >= 0) {
+      const newQty = (list[idx].quantity || 1) + delta;
+      if (newQty <= 0) {
+        list.splice(idx, 1);
+      } else {
+        list[idx].quantity = Math.min(3, newQty);
+      }
+      setDeckFormData({ ...deckFormData, [section]: list });
+    }
+  };
+
+  // Xóa thẻ khỏi Deck
+  const handleRemoveCardFromDeck = (section, cardId) => {
+    const list = (deckFormData[section] || []).filter(c => String(c.card_id) !== String(cardId));
+    setDeckFormData({ ...deckFormData, [section]: list });
+  };
+
+  // Tự động tìm nạp thẻ theo Archetype
+  const handleAutoFillArchetype = async () => {
+    const arc = deckFormData.archetype?.trim();
+    if (!arc) {
+      showToast('error', 'Vui lòng nhập tên Archetype trước (ví dụ: Tearlament, Snake-Eye, Kashtira)!');
+      return;
+    }
+    setModalSearchLoading(true);
+    try {
+      const res = await getCards({ fname: arc, limit: 30 });
+      if (res.data?.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
+        const foundCards = res.data.data;
+        const main = [...(deckFormData.main_deck || [])];
+        const extra = [...(deckFormData.extra_deck || [])];
+
+        foundCards.forEach(c => {
+          const typeLower = (c.type || '').toLowerCase();
+          const isExtra = typeLower.includes('fusion') || typeLower.includes('synchro') || typeLower.includes('xyz') || typeLower.includes('link');
+          const targetList = isExtra ? extra : main;
+          
+          if (!targetList.some(item => String(item.card_id) === String(c.id))) {
+            targetList.push({
+              card_id: c.id,
+              name: c.name,
+              quantity: isExtra ? 1 : 2,
+              card_type: c.type || 'Monster',
+              image_url: c.card_images?.[0]?.image_url || `https://images.ygoprodeck.com/images/cards/${c.id}.jpg`,
+              image_url_small: c.card_images?.[0]?.image_url_small || `/images/cards/${c.id}_small.jpg`,
+              price: c.min_price || 0
+            });
+          }
+        });
+
+        setDeckFormData({
+          ...deckFormData,
+          main_deck: main,
+          extra_deck: extra
+        });
+        showToast('success', `Đã tự động nạp ${foundCards.length} lá bài thuộc hệ "${arc}"!`);
+      } else {
+        showToast('error', `Không tìm thấy lá bài nào khớp với Archetype "${arc}"`);
+      }
+    } catch (err) {
+      showToast('error', 'Lỗi khi tự động nạp thẻ theo Archetype');
+    } finally {
+      setModalSearchLoading(false);
+    }
   };
 
   const handleSaveDeck = async (e) => {
@@ -1000,9 +1129,9 @@ export default function AdminPage() {
         {/* ======================================================== */}
         {deckModalOpen && (
           <div className="admin-modal-overlay">
-            <div className="admin-modal-card">
+            <div className="admin-modal-card modal-lg">
               <div className="admin-modal-header">
-                <h3>{editingDeck ? 'Chỉnh Sửa Bộ Bài' : 'Tạo Bộ Bài Mới'}</h3>
+                <h3>{editingDeck ? 'Chỉnh Sửa Bộ Bài & Danh Sách Thẻ' : 'Tạo Bộ Bài Mới & Danh Sách Thẻ'}</h3>
                 <button
                   type="button"
                   className="admin-modal-close"
@@ -1012,14 +1141,14 @@ export default function AdminPage() {
                 </button>
               </div>
 
-              <form onSubmit={handleSaveDeck}>
-                <div className="admin-modal-body">
+              <form onSubmit={handleSaveDeck} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+                <div className="admin-modal-body" style={{ overflowY: 'auto', flex: 1, maxHeight: 'calc(88vh - 140px)' }}>
                   <div className="admin-form-group">
                     <label>Tên Bộ Bài *</label>
                     <input
                       type="text"
                       required
-                      placeholder="Ví dụ: Tenpai Dragon OTK, Snake-Eye Fire King..."
+                      placeholder="Ví dụ: Tenpai Dragon OTK, Snake-Eye Fire King, Tearlaments..."
                       value={deckFormData.name}
                       onChange={(e) => setDeckFormData({ ...deckFormData, name: e.target.value })}
                     />
@@ -1061,7 +1190,7 @@ export default function AdminPage() {
                       <label>Archetype</label>
                       <input
                         type="text"
-                        placeholder="Ví dụ: Tenpai, Snake-Eye, Kashtira..."
+                        placeholder="Ví dụ: Tenpai, Snake-Eye, Kashtira, Tearlament..."
                         value={deckFormData.archetype}
                         onChange={(e) => setDeckFormData({ ...deckFormData, archetype: e.target.value })}
                       />
@@ -1091,11 +1220,208 @@ export default function AdminPage() {
                   <div className="admin-form-group">
                     <label>Mô Tả Chiến Thuật</label>
                     <textarea
-                      rows={3}
+                      rows={2}
                       placeholder="Mô tả tóm tắt lối chơi và combo chính của bộ bài..."
                       value={deckFormData.description}
                       onChange={(e) => setDeckFormData({ ...deckFormData, description: e.target.value })}
                     />
+                  </div>
+
+                  {/* KHUNG QUẢN LÝ DANH SÁCH LÁ BÀI (CARDS MANAGEMENT) */}
+                  <div className="deck-cards-manager-box">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>
+                          Danh Sách Lá Bài Trong Deck
+                        </div>
+                        <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                          Main: <strong>{deckFormData.main_deck?.reduce((s, c) => s + (c.quantity || 1), 0) || 0}</strong> lá • 
+                          Extra: <strong>{deckFormData.extra_deck?.reduce((s, c) => s + (c.quantity || 1), 0) || 0}</strong> lá • 
+                          Side: <strong>{deckFormData.side_deck?.reduce((s, c) => s + (c.quantity || 1), 0) || 0}</strong> lá
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleAutoFillArchetype}
+                        className="btn-secondary"
+                        style={{ fontSize: '0.82rem', padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+                        title="Tự động tìm kiếm các lá bài theo Archetype đã điền ở trên"
+                      >
+                        ⚡ Tự động nạp theo Archetype
+                      </button>
+                    </div>
+
+                    {/* Ô TÌM VÀ THÊM THẺ NHANH */}
+                    <div style={{ marginBottom: '1rem', position: 'relative' }}>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <div style={{ position: 'relative', flex: 1 }}>
+                          <input
+                            type="text"
+                            placeholder="Gõ tên lá bài để tìm và thêm (vd: Ash Blossom, Tearlaments, Nibiru...)"
+                            value={modalCardSearch}
+                            onChange={(e) => handleSearchModalCards(e.target.value)}
+                            style={{ width: '100%', paddingLeft: '2.2rem' }}
+                          />
+                          <Search size={16} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+                        </div>
+                      </div>
+
+                      {/* Dropdown danh sách lá bài tìm thấy */}
+                      {modalCardResults.length > 0 && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: 0,
+                          right: 0,
+                          backgroundColor: 'var(--bg-card)',
+                          border: '1px solid var(--border-color)',
+                          borderRadius: '8px',
+                          boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+                          maxHeight: '260px',
+                          overflowY: 'auto',
+                          zIndex: 100,
+                          marginTop: '4px',
+                          padding: '0.4rem'
+                        }}>
+                          {modalCardResults.map((c) => (
+                            <div
+                              key={c.id}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '0.45rem 0.6rem',
+                                borderBottom: '1px solid var(--border-color)',
+                                gap: '0.5rem'
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', overflow: 'hidden' }}>
+                                <img
+                                  src={c.card_images?.[0]?.image_url_small || `/images/cards/${c.id}_small.jpg`}
+                                  alt={c.name}
+                                  style={{ width: '28px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}
+                                  onError={(e) => { e.target.src = 'https://images.ygoprodeck.com/images/cards_small/back.jpg'; }}
+                                />
+                                <div>
+                                  <div style={{ fontWeight: 600, fontSize: '0.88rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    {c.name}
+                                  </div>
+                                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                    {c.type} • {c.min_price > 0 ? `$${c.min_price}` : 'Chưa có giá'}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div style={{ display: 'flex', gap: '0.35rem', flexShrink: 0 }}>
+                                <button
+                                  type="button"
+                                  onClick={() => handleAddCardToDeck(c, 'main_deck', 1)}
+                                  style={{ padding: '0.3rem 0.55rem', fontSize: '0.75rem', borderRadius: '6px', border: '1px solid #3b82f6', background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', cursor: 'pointer', fontWeight: 600 }}
+                                >
+                                  + Main
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleAddCardToDeck(c, 'extra_deck', 1)}
+                                  style={{ padding: '0.3rem 0.55rem', fontSize: '0.75rem', borderRadius: '6px', border: '1px solid #a855f7', background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', cursor: 'pointer', fontWeight: 600 }}
+                                >
+                                  + Extra
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleAddCardToDeck(c, 'side_deck', 1)}
+                                  style={{ padding: '0.3rem 0.55rem', fontSize: '0.75rem', borderRadius: '6px', border: '1px solid #64748b', background: 'rgba(100, 116, 139, 0.15)', color: '#94a3b8', cursor: 'pointer', fontWeight: 600 }}
+                                >
+                                  + Side
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* TABS CHUYỂN XEM MAIN / EXTRA / SIDE */}
+                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                      <button
+                        type="button"
+                        onClick={() => setDeckViewSection('main_deck')}
+                        className={`manager-tab-btn ${deckViewSection === 'main_deck' ? 'active' : ''}`}
+                      >
+                        Main Deck ({deckFormData.main_deck?.reduce((s, c) => s + (c.quantity || 1), 0) || 0})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeckViewSection('extra_deck')}
+                        className={`manager-tab-btn ${deckViewSection === 'extra_deck' ? 'active' : ''}`}
+                      >
+                        Extra Deck ({deckFormData.extra_deck?.reduce((s, c) => s + (c.quantity || 1), 0) || 0})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeckViewSection('side_deck')}
+                        className={`manager-tab-btn ${deckViewSection === 'side_deck' ? 'active' : ''}`}
+                      >
+                        Side Deck ({deckFormData.side_deck?.reduce((s, c) => s + (c.quantity || 1), 0) || 0})
+                      </button>
+                    </div>
+
+                    {/* DANH SÁCH THẺ TRONG SECTION ĐANG CHỌN */}
+                    <div style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.4rem', background: 'var(--bg-primary)' }}>
+                      {(deckFormData[deckViewSection] || []).length === 0 ? (
+                        <div style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                          Chưa có lá bài nào trong phần này. Hãy tìm kiếm ở trên để thêm vào.
+                        </div>
+                      ) : (
+                        (deckFormData[deckViewSection] || []).map((c) => (
+                          <div key={c.card_id} className="modal-card-item-row">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', overflow: 'hidden' }}>
+                              <img
+                                src={c.image_url_small || `/images/cards/${c.card_id}_small.jpg`}
+                                alt={c.name}
+                                style={{ width: '22px', height: '32px', objectFit: 'cover', borderRadius: '3px' }}
+                                onError={(e) => { e.target.src = 'https://images.ygoprodeck.com/images/cards_small/back.jpg'; }}
+                              />
+                              <span style={{ fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {c.name}
+                              </span>
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'var(--bg-secondary)', borderRadius: '6px', padding: '0.15rem 0.35rem' }}>
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateCardQty(deckViewSection, c.card_id, -1)}
+                                  style={{ border: 'none', background: 'none', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 700, padding: '0 4px' }}
+                                >
+                                  -
+                                </button>
+                                <span style={{ fontSize: '0.82rem', fontWeight: 700, minWidth: '16px', textAlign: 'center' }}>
+                                  {c.quantity || 1}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateCardQty(deckViewSection, c.card_id, 1)}
+                                  style={{ border: 'none', background: 'none', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 700, padding: '0 4px' }}
+                                >
+                                  +
+                                </button>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveCardFromDeck(deckViewSection, c.card_id)}
+                                style={{ border: 'none', background: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.2rem' }}
+                                title="Xóa thẻ khỏi Deck"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
                   </div>
 
                   <div className="admin-form-checkbox">
@@ -1124,7 +1450,7 @@ export default function AdminPage() {
                     className="btn-admin-primary"
                     disabled={deckSubmitting}
                   >
-                    {deckSubmitting ? 'Đang lưu...' : (editingDeck ? 'Cập Nhật' : 'Tạo Mới')}
+                    {deckSubmitting ? 'Đang lưu...' : (editingDeck ? 'Cập Nhật Bộ Bài' : 'Tạo Mới Bộ Bài')}
                   </button>
                 </div>
               </form>
