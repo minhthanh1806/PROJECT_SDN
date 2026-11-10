@@ -46,7 +46,10 @@ export const updateAdminDeck = (id, data) => API.put(`/admin/decks/${id}`, data)
 export const deleteAdminDeck = (id) => API.delete(`/admin/decks/${id}`);
 
 export const getAdminCards = (params) => API.get('/admin/cards', { params });
+export const createAdminCard = (data) => API.post('/admin/cards', data);
+export const updateAdminCard = (id, data) => API.put(`/admin/cards/${id}`, data);
 export const updateCardPrice = (id, data) => API.put(`/admin/cards/${id}/price`, data);
+export const deleteAdminCard = (id) => API.delete(`/admin/cards/${id}`);
 
 export const getAdminUsers = (params) => API.get('/admin/users', { params });
 export const updateUserRole = (id, role) => API.put(`/admin/users/${id}/role`, { role });

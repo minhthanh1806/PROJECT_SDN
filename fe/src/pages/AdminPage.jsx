@@ -10,7 +10,10 @@ import {
   updateAdminDeck,
   deleteAdminDeck,
   getAdminCards,
+  createAdminCard,
+  updateAdminCard,
   updateCardPrice,
+  deleteAdminCard,
   getAdminUsers,
   updateUserRole,
   deleteUser,
@@ -90,6 +93,24 @@ export default function AdminPage() {
   const [cardsLoading, setCardsLoading] = useState(false);
   const [editingCardId, setEditingCardId] = useState(null);
   const [editingCardPrice, setEditingCardPrice] = useState('');
+  const [cardModalOpen, setCardModalOpen] = useState(false);
+  const [editingCard, setEditingCard] = useState(null);
+  const [cardFormData, setCardFormData] = useState({
+    id: '',
+    name: '',
+    type: 'Normal Monster',
+    attribute: 'DARK',
+    race: 'Dragon',
+    level: 4,
+    atk: 1500,
+    def: 1000,
+    archetype: '',
+    min_price: 1.0,
+    ban_tcg: 'Unlimited',
+    image_url: '',
+    desc: ''
+  });
+  const [cardSubmitting, setCardSubmitting] = useState(false);
 
   // Users Management
   const [usersList, setUsersList] = useState([]);
@@ -426,6 +447,91 @@ export default function AdminPage() {
       }
     } catch (err) {
       showToast('error', err.response?.data?.message || 'Lỗi khi cập nhật giá');
+    }
+  };
+
+  // Mở modal Thêm / Sửa Thẻ Bài
+  const handleOpenCardModal = (card = null) => {
+    if (card) {
+      setEditingCard(card);
+      setCardFormData({
+        id: card.id || '',
+        name: card.name || '',
+        type: card.type || 'Normal Monster',
+        attribute: card.attribute || 'DARK',
+        race: card.race || 'Dragon',
+        level: card.level !== undefined ? card.level : 4,
+        atk: card.atk !== undefined ? card.atk : 1500,
+        def: card.def !== undefined ? card.def : 1000,
+        archetype: card.archetype || '',
+        min_price: card.min_price || 0,
+        ban_tcg: card.banlist_info?.ban_tcg || 'Unlimited',
+        image_url: card.card_images?.[0]?.image_url || '',
+        desc: card.desc || ''
+      });
+    } else {
+      setEditingCard(null);
+      setCardFormData({
+        id: '',
+        name: '',
+        type: 'Effect Monster',
+        attribute: 'DARK',
+        race: 'Dragon',
+        level: 4,
+        atk: 1500,
+        def: 1000,
+        archetype: '',
+        min_price: 1.0,
+        ban_tcg: 'Unlimited',
+        image_url: '',
+        desc: ''
+      });
+    }
+    setCardModalOpen(true);
+  };
+
+  // Lưu Thẻ Bài (Tạo mới hoặc Cập nhật)
+  const handleSaveCard = async (e) => {
+    e.preventDefault();
+    if (!cardFormData.name.trim()) {
+      showToast('error', 'Vui lòng nhập tên lá bài');
+      return;
+    }
+    setCardSubmitting(true);
+    try {
+      if (editingCard) {
+        const res = await updateAdminCard(editingCard.id, cardFormData);
+        if (res.data?.success) {
+          showToast('success', `Đã cập nhật lá bài "${cardFormData.name}"!`);
+          setCardModalOpen(false);
+          loadCards();
+        }
+      } else {
+        const res = await createAdminCard(cardFormData);
+        if (res.data?.success) {
+          showToast('success', `Đã thêm mới lá bài "${cardFormData.name}"!`);
+          setCardModalOpen(false);
+          loadCards();
+        }
+      }
+    } catch (err) {
+      showToast('error', err.response?.data?.message || 'Có lỗi xảy ra khi lưu lá bài');
+    } finally {
+      setCardSubmitting(false);
+    }
+  };
+
+  // Xóa Thẻ Bài
+  const handleDeleteCard = async (card) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa lá bài "${card.name}" (#${card.id})? Hành động này không thể hoàn tác.`)) return;
+    try {
+      const res = await deleteAdminCard(card.id);
+      if (res.data?.success) {
+        showToast('success', `Đã xóa lá bài "${card.name}"`);
+        loadCards();
+      }
+    } catch (err) {
+      showToast('error', err.response?.data?.message || 'Không thể xóa lá bài');
     }
   };
 
@@ -902,8 +1008,17 @@ export default function AdminPage() {
                 />
               </div>
 
-              <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                Tổng cộng: <strong>{cardTotalCount.toLocaleString()}</strong> lá bài
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                  Tổng cộng: <strong>{cardTotalCount.toLocaleString()}</strong> lá bài
+                </div>
+                <button
+                  type="button"
+                  className="btn-admin-primary"
+                  onClick={() => handleOpenCardModal()}
+                >
+                  <Plus size={16} /> Thêm Thẻ Bài Mới
+                </button>
               </div>
             </div>
 
@@ -983,17 +1098,24 @@ export default function AdminPage() {
                           </td>
                           <td>
                             {editingCardId !== c.id && (
-                              <button
-                                type="button"
-                                className="action-icon-btn edit"
-                                title="Sửa giá lá bài"
-                                onClick={() => {
-                                  setEditingCardId(c.id);
-                                  setEditingCardPrice(c.min_price || 0);
-                                }}
-                              >
-                                <Edit2 size={15} /> Sửa Giá
-                              </button>
+                              <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
+                                <button
+                                  type="button"
+                                  className="action-icon-btn edit"
+                                  title="Chỉnh sửa thông tin lá bài"
+                                  onClick={() => handleOpenCardModal(c)}
+                                >
+                                  <Edit2 size={14} /> Sửa
+                                </button>
+                                <button
+                                  type="button"
+                                  className="action-icon-btn delete"
+                                  title="Xóa lá bài khỏi cơ sở dữ liệu"
+                                  onClick={() => handleDeleteCard(c)}
+                                >
+                                  <Trash2 size={14} /> Xóa
+                                </button>
+                              </div>
                             )}
                           </td>
                         </tr>
@@ -1451,6 +1573,219 @@ export default function AdminPage() {
                     disabled={deckSubmitting}
                   >
                     {deckSubmitting ? 'Đang lưu...' : (editingDeck ? 'Cập Nhật Bộ Bài' : 'Tạo Mới Bộ Bài')}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* MODAL THÊM / SỬA LÁ BÀI (CARD) */}
+        {/* ======================================================== */}
+        {cardModalOpen && (
+          <div className="admin-modal-overlay">
+            <div className="admin-modal-card modal-lg">
+              <div className="admin-modal-header">
+                <h3>{editingCard ? `Chỉnh Sửa Lá Bài #${editingCard.id}` : 'Thêm Lá Bài Mới Vào Cơ Sở Dữ Liệu'}</h3>
+                <button
+                  type="button"
+                  className="admin-modal-close"
+                  onClick={() => setCardModalOpen(false)}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveCard} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+                <div className="admin-modal-body" style={{ overflowY: 'auto', flex: 1, maxHeight: 'calc(88vh - 140px)' }}>
+                  <div className="admin-form-row">
+                    <div className="admin-form-group">
+                      <label>Passcode ID (Mã 8 số) {editingCard ? '(Cố định)' : ''}</label>
+                      <input
+                        type="number"
+                        placeholder="Để trống để tự động sinh mã ID ngẫu nhiên"
+                        value={cardFormData.id}
+                        disabled={!!editingCard}
+                        onChange={(e) => setCardFormData({ ...cardFormData, id: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="admin-form-group">
+                      <label>Tên Lá Bài *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Ví dụ: Blue-Eyes White Dragon, Dark Magician..."
+                        value={cardFormData.name}
+                        onChange={(e) => setCardFormData({ ...cardFormData, name: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="admin-form-row">
+                    <div className="admin-form-group">
+                      <label>Loại Thẻ (Card Type) *</label>
+                      <select
+                        value={cardFormData.type}
+                        onChange={(e) => setCardFormData({ ...cardFormData, type: e.target.value })}
+                      >
+                        <option value="Normal Monster">Normal Monster</option>
+                        <option value="Effect Monster">Effect Monster</option>
+                        <option value="Tuner Monster">Tuner Monster</option>
+                        <option value="Flip Effect Monster">Flip Effect Monster</option>
+                        <option value="Ritual Monster">Ritual Monster</option>
+                        <option value="Ritual Effect Monster">Ritual Effect Monster</option>
+                        <option value="Fusion Monster">Fusion Monster</option>
+                        <option value="Synchro Monster">Synchro Monster</option>
+                        <option value="Synchro Tuner Monster">Synchro Tuner Monster</option>
+                        <option value="XYZ Monster">XYZ Monster</option>
+                        <option value="Pendulum Effect Monster">Pendulum Effect Monster</option>
+                        <option value="Link Monster">Link Monster</option>
+                        <option value="Spell Card">Spell Card (Phép)</option>
+                        <option value="Trap Card">Trap Card (Bẫy)</option>
+                      </select>
+                    </div>
+
+                    <div className="admin-form-group">
+                      <label>Thuộc Tính (Attribute)</label>
+                      <select
+                        value={cardFormData.attribute}
+                        onChange={(e) => setCardFormData({ ...cardFormData, attribute: e.target.value })}
+                      >
+                        <option value="">Không có (Spells / Traps)</option>
+                        <option value="DARK">DARK (Bóng tối)</option>
+                        <option value="LIGHT">LIGHT (Ánh sáng)</option>
+                        <option value="EARTH">EARTH (Đất)</option>
+                        <option value="WATER">WATER (Nước)</option>
+                        <option value="FIRE">FIRE (Lửa)</option>
+                        <option value="WIND">WIND (Gió)</option>
+                        <option value="DIVINE">DIVINE (Thần)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="admin-form-row">
+                    <div className="admin-form-group">
+                      <label>Chủng Tộc / Race</label>
+                      <input
+                        type="text"
+                        placeholder="Dragon, Spellcaster, Warrior, Cyberse, Normal, Quick-Play..."
+                        value={cardFormData.race}
+                        onChange={(e) => setCardFormData({ ...cardFormData, race: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="admin-form-group">
+                      <label>Cấp Sao / Rank (1-12)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="12"
+                        placeholder="1 - 12"
+                        value={cardFormData.level}
+                        onChange={(e) => setCardFormData({ ...cardFormData, level: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="admin-form-row">
+                    <div className="admin-form-group">
+                      <label>Sức Tấn Công (ATK)</label>
+                      <input
+                        type="number"
+                        placeholder="Ví dụ: 2500, 3000..."
+                        value={cardFormData.atk}
+                        onChange={(e) => setCardFormData({ ...cardFormData, atk: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="admin-form-group">
+                      <label>Sức Phòng Thủ (DEF)</label>
+                      <input
+                        type="number"
+                        placeholder="Ví dụ: 2000, 2500..."
+                        value={cardFormData.def}
+                        onChange={(e) => setCardFormData({ ...cardFormData, def: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="admin-form-row">
+                    <div className="admin-form-group">
+                      <label>Archetype (Hệ bài)</label>
+                      <input
+                        type="text"
+                        placeholder="Ví dụ: Blue-Eyes, Dark Magician, Tearlaments, Snake-Eye..."
+                        value={cardFormData.archetype}
+                        onChange={(e) => setCardFormData({ ...cardFormData, archetype: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="admin-form-group">
+                      <label>Giá Thấp Nhất ($)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="0.00"
+                        value={cardFormData.min_price}
+                        onChange={(e) => setCardFormData({ ...cardFormData, min_price: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="admin-form-row">
+                    <div className="admin-form-group">
+                      <label>Trạng Thái Banlist</label>
+                      <select
+                        value={cardFormData.ban_tcg}
+                        onChange={(e) => setCardFormData({ ...cardFormData, ban_tcg: e.target.value })}
+                      >
+                        <option value="Unlimited">Không cấm (Unlimited - Tối đa 3 lá)</option>
+                        <option value="Semi-Limited">Hạn chế 2 (Semi-Limited - Tối đa 2 lá)</option>
+                        <option value="Limited">Hạn chế 1 (Limited - Tối đa 1 lá)</option>
+                        <option value="Forbidden">Bị cấm (Forbidden - 0 lá)</option>
+                      </select>
+                    </div>
+
+                    <div className="admin-form-group">
+                      <label>Đường Dẫn Ảnh Thẻ (Image URL)</label>
+                      <input
+                        type="url"
+                        placeholder="Để trống để tự động lấy từ CDN"
+                        value={cardFormData.image_url}
+                        onChange={(e) => setCardFormData({ ...cardFormData, image_url: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Mô Tả Hiệu Ứng Lá Bài (Card Effect / Lore)</label>
+                    <textarea
+                      rows={4}
+                      placeholder="Nhập nội dung hiệu ứng chi tiết của lá bài..."
+                      value={cardFormData.desc}
+                      onChange={(e) => setCardFormData({ ...cardFormData, desc: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="admin-modal-footer">
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={() => setCardModalOpen(false)}
+                    disabled={cardSubmitting}
+                  >
+                    Hủy Bỏ
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn-admin-primary"
+                    disabled={cardSubmitting}
+                  >
+                    {cardSubmitting ? 'Đang lưu...' : (editingCard ? 'Cập Nhật Lá Bài' : 'Lưu Lá Bài Mới')}
                   </button>
                 </div>
               </form>

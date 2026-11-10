@@ -15,9 +15,12 @@ router.post('/decks', adminController.createAdminDeck);
 router.put('/decks/:id', adminController.updateAdminDeck);
 router.delete('/decks/:id', adminController.deleteAdminDeck);
 
-// 3. Quản lý Thẻ bài & Giá
+// 3. Quản lý Thẻ bài & Giá (CRUD)
 router.get('/cards', adminController.getAdminCards);
+router.post('/cards', adminController.createAdminCard);
+router.put('/cards/:id', adminController.updateAdminCard);
 router.put('/cards/:id/price', adminController.updateCardPrice);
+router.delete('/cards/:id', adminController.deleteAdminCard);
 
 // 4. Quản lý Người dùng
 router.get('/users', adminController.getAdminUsers);

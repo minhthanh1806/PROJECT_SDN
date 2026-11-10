@@ -157,13 +157,33 @@ export default function DeckDetailPage() {
     );
   }
 
+  // Danh sách thẻ bài trong từng phần
+  const mainCards = deck.main_deck || [];
+  const extraCards = deck.extra_deck || [];
+  const sideCards = deck.side_deck || [];
+
   // Phân loại thẻ trong Main Deck thành Monsters, Spells, Traps
-  const monsters = (deck.main_deck || []).filter((c) => {
+  const monsters = mainCards.filter((c) => {
     const t = (c.card_type || '').toLowerCase();
     return !t.includes('spell') && !t.includes('trap');
   });
-  const spells = (deck.main_deck || []).filter((c) => (c.card_type || '').toLowerCase().includes('spell'));
-  const traps = (deck.main_deck || []).filter((c) => (c.card_type || '').toLowerCase().includes('trap'));
+  const spells = mainCards.filter((c) => (c.card_type || '').toLowerCase().includes('spell'));
+  const traps = mainCards.filter((c) => (c.card_type || '').toLowerCase().includes('trap'));
+
+  // Tính toán số lượng và thống kê chính xác, chống NaN
+  const monsterCount = monsters.reduce((s, c) => s + (c.quantity || 1), 0) || (deck.stats?.monster_count || 0);
+  const spellCount = spells.reduce((s, c) => s + (c.quantity || 1), 0) || (deck.stats?.spell_count || 0);
+  const trapCount = traps.reduce((s, c) => s + (c.quantity || 1), 0) || (deck.stats?.trap_count || 0);
+  const mainCount = mainCards.reduce((s, c) => s + (c.quantity || 1), 0) || (deck.stats?.main_count || 0);
+  const extraCount = extraCards.reduce((s, c) => s + (c.quantity || 1), 0) || (deck.stats?.extra_count || 0);
+  const sideCount = sideCards.reduce((s, c) => s + (c.quantity || 1), 0) || (deck.stats?.side_count || 0);
+  const totalCardsCount = mainCount + extraCount + sideCount;
+
+  const calculatedPrice = [...mainCards, ...extraCards, ...sideCards].reduce(
+    (sum, c) => sum + (Number(c.price) || 0) * (c.quantity || 1),
+    0
+  );
+  const displayPrice = calculatedPrice > 0 ? calculatedPrice : (Number(deck.stats?.total_price) || 0);
 
   return (
     <div className="app-shell">
@@ -212,10 +232,10 @@ export default function DeckDetailPage() {
               <div className="deck-price-box">
                 <div className="price-box-label">Ước tính giá thị trường (TCG)</div>
                 <div className="price-box-amount">
-                  ${Number(deck.stats?.total_price || 0).toFixed(2)}
+                  ${Number(displayPrice).toFixed(2)}
                 </div>
                 <div className="price-box-note">
-                  Tổng {deck.stats?.main_count + deck.stats?.extra_count + deck.stats?.side_count} lá bài
+                  Tổng {totalCardsCount} lá bài
                 </div>
               </div>
 
@@ -254,27 +274,27 @@ export default function DeckDetailPage() {
           {/* THANH THỐNG KÊ CHI TIẾT MAIN / EXTRA / SIDE */}
           <div className="deck-stats-strip">
             <div className="stat-strip-item">
-              <span className="stat-num">{deck.stats?.main_count ?? 0}</span>
+              <span className="stat-num">{mainCount}</span>
               <span className="stat-lbl">Main Deck</span>
             </div>
             <div className="stat-strip-item">
-              <span className="stat-num">{deck.stats?.monster_count || 0}</span>
+              <span className="stat-num">{monsterCount}</span>
               <span className="stat-lbl">Quái thú (Monster)</span>
             </div>
             <div className="stat-strip-item">
-              <span className="stat-num">{deck.stats?.spell_count || 0}</span>
+              <span className="stat-num">{spellCount}</span>
               <span className="stat-lbl">Phép (Spell)</span>
             </div>
             <div className="stat-strip-item">
-              <span className="stat-num">{deck.stats?.trap_count || 0}</span>
+              <span className="stat-num">{trapCount}</span>
               <span className="stat-lbl">Bẫy (Trap)</span>
             </div>
             <div className="stat-strip-item">
-              <span className="stat-num">{deck.stats?.extra_count || 0}</span>
+              <span className="stat-num">{extraCount}</span>
               <span className="stat-lbl">Extra Deck</span>
             </div>
             <div className="stat-strip-item">
-              <span className="stat-num">{deck.stats?.side_count || 0}</span>
+              <span className="stat-num">{sideCount}</span>
               <span className="stat-lbl">Side Deck</span>
             </div>
           </div>
@@ -333,14 +353,14 @@ export default function DeckDetailPage() {
               <div className="deck-section-header">
                 <div className="section-title">
                   <Layers size={18} color="var(--primary)" />
-                  <span>Main Deck ({deck.stats?.main_count ?? 0} lá)</span>
+                  <span>Main Deck ({mainCount} lá)</span>
                 </div>
                 <div className="section-counts-breakdown">
-                  <span>Monster: {deck.stats?.monster_count || 0}</span>
+                  <span>Monster: {monsterCount}</span>
                   <span>•</span>
-                  <span>Spell: {deck.stats?.spell_count || 0}</span>
+                  <span>Spell: {spellCount}</span>
                   <span>•</span>
-                  <span>Trap: {deck.stats?.trap_count || 0}</span>
+                  <span>Trap: {trapCount}</span>
                 </div>
               </div>
 
