@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { getDeckById, likeDeck } from '../services/api';
+import { getDeckById, likeDeck, translateCardEffect } from '../services/api';
 import {
   ArrowLeft,
   Layers,
@@ -13,7 +13,9 @@ import {
   Eye,
   Sparkles,
   ExternalLink,
-  ShieldAlert
+  ShieldAlert,
+  Languages,
+  RefreshCw
 } from 'lucide-react';
 
 export default function DeckDetailPage() {
@@ -26,6 +28,26 @@ export default function DeckDetailPage() {
   const [likesCount, setLikesCount] = useState(0);
   const [hasLiked, setHasLiked] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
+  const [previewLang, setPreviewLang] = useState('vi'); // Mặc định hiển thị tiếng Việt nếu có
+  const [previewTranslating, setPreviewTranslating] = useState(false);
+
+  // Xử lý chuyển ngôn ngữ bản dịch trong sidebar preview của Deck
+  const handleTogglePreviewLang = async (lang) => {
+    setPreviewLang(lang);
+    if (lang === 'vi' && selectedCard && (!selectedCard.desc_vi || selectedCard.desc_vi.trim() === '')) {
+      setPreviewTranslating(true);
+      try {
+        const res = await translateCardEffect(selectedCard.card_id);
+        if (res.data?.success && res.data.desc_vi) {
+          setSelectedCard((prev) => ({ ...prev, desc_vi: res.data.desc_vi }));
+        }
+      } catch (err) {
+        console.error('Error translating card in deck preview:', err);
+      } finally {
+        setPreviewTranslating(false);
+      }
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -329,6 +351,39 @@ export default function DeckDetailPage() {
                     {selectedCard.price > 0 ? `$${selectedCard.price.toFixed(2)}` : 'Chưa có giá'}
                   </span>
                 </div>
+
+                {/* Khung xem nhanh hiệu ứng lá bài với Toggle EN / VI */}
+                {(selectedCard.desc || selectedCard.desc_vi) && (
+                  <div className="preview-desc-wrap">
+                    <div className="preview-desc-header">
+                      <span className="preview-desc-title">Hiệu ứng thẻ bài:</span>
+                      <div className="preview-lang-pills">
+                        <button
+                          type="button"
+                          onClick={() => handleTogglePreviewLang('vi')}
+                          className={`preview-lang-btn ${previewLang === 'vi' ? 'active' : ''}`}
+                          title="Xem bản dịch Tiếng Việt"
+                        >
+                          {previewTranslating ? '...' : '🇻🇳 VI'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleTogglePreviewLang('en')}
+                          className={`preview-lang-btn ${previewLang === 'en' ? 'active' : ''}`}
+                          title="Xem bản gốc Tiếng Anh"
+                        >
+                          🇬🇧 EN
+                        </button>
+                      </div>
+                    </div>
+                    <div className="preview-desc-text">
+                      {previewLang === 'vi'
+                        ? (selectedCard.desc_vi || (previewTranslating ? 'Đang tải bản dịch Tiếng Việt...' : selectedCard.desc))
+                        : selectedCard.desc}
+                    </div>
+                  </div>
+                )}
+
                 <Link
                   to={`/card/${selectedCard.card_id}`}
                   className="preview-detail-btn"

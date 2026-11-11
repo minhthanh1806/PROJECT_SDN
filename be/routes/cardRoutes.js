@@ -8,6 +8,10 @@ router.get('/', cardController.getCards);
 // Lấy danh sách thẻ bài thuộc Banlist (Forbidden, Limited, Semi-Limited)
 router.get('/sample/banned', cardController.getSampleBannedCards);
 
+// Dịch hiệu ứng lá bài sang tiếng Việt
+router.get('/:id/translate', cardController.translateCardEffect);
+router.post('/:id/translate', cardController.translateCardEffect);
+
 // Lấy chi tiết một thẻ bài theo ID
 router.get('/:id', cardController.getCardById);
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { getCardById } from '../services/api';
+import { getCardById, translateCardEffect } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import {
   ArrowLeft,
@@ -9,7 +9,10 @@ import {
   ShieldAlert,
   Coins,
   Clock,
-  Layers
+  Layers,
+  Languages,
+  Sparkles,
+  RefreshCw
 } from 'lucide-react';
 
 export default function CardDetailPage() {
@@ -22,14 +25,24 @@ export default function CardDetailPage() {
   const [isFavorited, setIsFavorited] = useState(false);
   const [starLoading, setStarLoading] = useState(false);
 
+  // Trạng thái dịch hiệu ứng sang Tiếng Việt
+  const [isVietnamese, setIsVietnamese] = useState(false);
+  const [translatedDesc, setTranslatedDesc] = useState('');
+  const [translating, setTranslating] = useState(false);
+  const [translateError, setTranslateError] = useState(null);
+
   useEffect(() => {
     setLoading(true);
     setError(null);
     getCardById(id)
       .then((res) => {
         if (res.data?.success) {
-          setCard(res.data.data);
-          setIsFavorited(isCardFavorited(res.data.data.id));
+          const cardData = res.data.data;
+          setCard(cardData);
+          setIsFavorited(isCardFavorited(cardData.id));
+          if (cardData.desc_vi && cardData.desc_vi.trim() !== '') {
+            setTranslatedDesc(cardData.desc_vi);
+          }
         } else {
           setError('Không tìm thấy thông tin thẻ bài');
         }
@@ -40,6 +53,57 @@ export default function CardDetailPage() {
       })
       .finally(() => setLoading(false));
   }, [id, user]);
+
+  // Chuyển đổi ngôn ngữ hiển thị (Anh / Việt)
+  const handleToggleLanguage = async (targetLang) => {
+    if (targetLang === 'en') {
+      setIsVietnamese(false);
+      return;
+    }
+
+    // Nếu đã có sẵn bản dịch tiếng Việt (từ DB)
+    if (translatedDesc && translatedDesc.trim() !== '') {
+      setIsVietnamese(true);
+      return;
+    }
+
+    // Nếu chưa có, kích hoạt API dịch tự động
+    setTranslating(true);
+    setTranslateError(null);
+    try {
+      const res = await translateCardEffect(card.id);
+      if (res.data?.success && res.data.desc_vi) {
+        setTranslatedDesc(res.data.desc_vi);
+        setIsVietnamese(true);
+      } else {
+        setTranslateError('Không thể lấy bản dịch tiếng Việt lúc này. Vui lòng thử lại!');
+      }
+    } catch (err) {
+      console.error('Error translating card effect:', err);
+      setTranslateError('Lỗi kết nối khi dịch hiệu ứng. Vui lòng thử lại sau!');
+    } finally {
+      setTranslating(false);
+    }
+  };
+
+  // Dịch lại bản mới (bỏ qua cache)
+  const handleForceRetranslate = async () => {
+    if (!card || translating) return;
+    setTranslating(true);
+    setTranslateError(null);
+    try {
+      const res = await translateCardEffect(card.id, true);
+      if (res.data?.success && res.data.desc_vi) {
+        setTranslatedDesc(res.data.desc_vi);
+        setIsVietnamese(true);
+      }
+    } catch (err) {
+      console.error('Error re-translating card effect:', err);
+      setTranslateError('Lỗi khi dịch lại hiệu ứng.');
+    } finally {
+      setTranslating(false);
+    }
+  };
 
   const handleToggleFavorite = async () => {
     if (!user) {
@@ -218,10 +282,81 @@ export default function CardDetailPage() {
               </div>
             )}
 
-            {/* Khung mô tả / Hiệu ứng lá bài */}
+            {/* Khung mô tả / Hiệu ứng lá bài với tính năng Dịch sang Tiếng Việt */}
             <div className="detail-desc-box">
-              <div className="desc-title">Hiệu ứng / Mô tả lá bài:</div>
-              <div className="desc-content">{card.desc || 'Không có mô tả cho thẻ này.'}</div>
+              <div className="desc-header-row">
+                <div className="desc-title">
+                  <Languages size={18} style={{ display: 'inline', verticalAlign: '-3px', marginRight: 6, color: 'var(--primary)' }} />
+                  <span>Hiệu ứng / Mô tả lá bài:</span>
+                </div>
+
+                {/* NÚT CHUYỂN ĐỔI NGÔN NGỮ TIẾNG VIỆT / TIẾNG ANH */}
+                <div className="lang-toggle-group">
+                  <button
+                    type="button"
+                    onClick={() => handleToggleLanguage('en')}
+                    className={`lang-btn ${!isVietnamese ? 'active' : ''}`}
+                    title="Xem bản gốc Tiếng Anh chuẩn TCG"
+                  >
+                    <span>🇬🇧 English</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleToggleLanguage('vi')}
+                    className={`lang-btn ${isVietnamese ? 'active' : ''}`}
+                    title="Dịch hiệu ứng lá bài sang Tiếng Việt"
+                    disabled={translating}
+                  >
+                    {translating ? (
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <RefreshCw size={12} className="spin" /> Đang dịch...
+                      </span>
+                    ) : (
+                      <span>🇻🇳 Tiếng Việt</span>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Thanh thông báo bản dịch Tiếng Việt & Nút dịch lại */}
+              {isVietnamese && (
+                <div className="trans-notice-bar">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Sparkles size={14} color="#10b981" />
+                    <span>Bản dịch Tiếng Việt chuẩn thuật ngữ Yu-Gi-Oh (Official)</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleForceRetranslate}
+                    className="retranslate-btn"
+                    title="Dịch lại bản mới nhất từ máy chủ"
+                    disabled={translating}
+                  >
+                    <RefreshCw size={12} className={translating ? 'spin' : ''} />
+                    <span>{translating ? 'Đang dịch...' : 'Dịch lại'}</span>
+                  </button>
+                </div>
+              )}
+
+              {translateError && (
+                <div className="trans-error-box" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <span>{translateError}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleToggleLanguage('vi')}
+                    className="retranslate-btn"
+                    style={{ background: 'rgba(239, 68, 68, 0.25)', borderColor: 'rgba(239, 68, 68, 0.5)', color: '#fee2e2' }}
+                  >
+                    <RefreshCw size={12} /> Thử lại
+                  </button>
+                </div>
+              )}
+
+              <div className="desc-content">
+                {isVietnamese
+                  ? (translatedDesc || 'Đang tải bản dịch Tiếng Việt...')
+                  : (card.desc || 'Không có mô tả cho thẻ này.')}
+              </div>
             </div>
 
             {/* KHỐI GIÁ THỊ TRƯỜNG TỪ 5 NGUỒN (Cardmarket, TCGplayer, eBay, Amazon, CoolStuffInc) */}

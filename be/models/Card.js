@@ -37,6 +37,7 @@ const cardSchema = new mongoose.Schema({
   type: { type: String, index: true },
   frameType: { type: String },
   desc: { type: String },
+  desc_vi: { type: String, default: '' },
   race: { type: String, index: true },
   attribute: { type: String, index: true },
   archetype: { type: String, index: true },

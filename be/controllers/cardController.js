@@ -156,6 +156,151 @@ exports.getCardById = async (req, res) => {
   }
 };
 
+// Hàm hỗ trợ dịch văn bản sang tiếng Việt đa tầng (Multi-tier translation pipeline)
+async function translateToVietnamese(text) {
+  if (!text || !text.trim()) return '';
+
+  // 1. Thử Provider 1: clients5.google.com (nhanh, hỗ trợ đa dòng, không bị chặn)
+  try {
+    const url = `https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=en&tl=vi&q=${encodeURIComponent(text)}`;
+    const response = await axios.get(url, {
+      timeout: 8000,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
+    });
+    if (response.data) {
+      if (Array.isArray(response.data)) {
+        return response.data.join('\n');
+      }
+      if (typeof response.data === 'string' && response.data.trim()) {
+        return response.data;
+      }
+    }
+  } catch (err1) {
+    console.warn('[Translate Provider 1 failed, trying Provider 2]:', err1.message);
+  }
+
+  // 2. Thử Provider 2: api.mymemory.translated.net
+  try {
+    const cleanText = text.substring(0, 500);
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(cleanText)}&langpair=en|vi`;
+    const response = await axios.get(url, { timeout: 8000 });
+    const trans = response.data?.responseData?.translatedText;
+    if (trans && typeof trans === 'string' && trans.trim()) {
+      return trans;
+    }
+  } catch (err2) {
+    console.warn('[Translate Provider 2 failed, trying Provider 3]:', err2.message);
+  }
+
+  // 3. Thử Provider 3: translate.googleapis.com (gtx)
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${encodeURIComponent(text)}`;
+    const response = await axios.get(url, {
+      timeout: 8000,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+      }
+    });
+    if (response.data && Array.isArray(response.data[0])) {
+      return response.data[0].map((item) => item[0]).join('');
+    }
+  } catch (err3) {
+    console.warn('[Translate Provider 3 failed, using dictionary fallback]:', err3.message);
+  }
+
+  // 4. Fallback cuối cùng: Từ điển thuật ngữ Yu-Gi-Oh để luôn trả về bản dịch dễ hiểu
+  let fallback = text;
+  const glossary = [
+    [/When this card is Normal Summoned/gi, 'Khi lá bài này được Triệu hồi Thường'],
+    [/If this card is Normal or Special Summoned/gi, 'Nếu lá bài này được Triệu hồi Thường hoặc Triệu hồi Đặc biệt'],
+    [/Special Summon this card/gi, 'Triệu hồi Đặc biệt lá bài này'],
+    [/Special Summon/gi, 'Triệu hồi Đặc biệt'],
+    [/Normal Summon\/Set/gi, 'Triệu hồi Thường/Úp'],
+    [/Normal Summon/gi, 'Triệu hồi Thường'],
+    [/from your hand or GY/gi, 'từ trên tay hoặc Mộ (GY)'],
+    [/from your Deck to your hand/gi, 'từ Bộ bài vào tay của bạn'],
+    [/from your Deck/gi, 'từ Bộ bài'],
+    [/from your hand/gi, 'từ trên tay'],
+    [/to the GY/gi, 'vào Mộ (GY)'],
+    [/in your GY/gi, 'trong Mộ (GY) của bạn'],
+    [/Quick Effect/gi, 'Hiệu ứng Nhanh (Quick Effect)'],
+    [/You can target/gi, 'Bạn có thể chọn mục tiêu'],
+    [/Once per turn/gi, 'Mỗi lượt một lần'],
+    [/destroy that card/gi, 'phá hủy lá bài đó'],
+    [/destroy it/gi, 'phá hủy nó'],
+    [/negate the activation/gi, 'phủ nhận kích hoạt'],
+    [/negate its effects/gi, 'vô hiệu hóa hiệu ứng của nó'],
+    [/banish it/gi, 'trục xuất lá bài đó'],
+    [/Ritual Summon/gi, 'Triệu hồi Nghi thức (Ritual Summon)'],
+    [/Synchro Summon/gi, 'Triệu hồi Đồng bộ (Synchro Summon)'],
+    [/Xyz Summon/gi, 'Triệu hồi Xyz'],
+    [/Link Summon/gi, 'Triệu hồi Link'],
+    [/tribute/gi, 'hiến tế'],
+    [/opponent controls/gi, 'đối thủ điều khiển'],
+    [/Spell\/Trap/gi, 'Phép/Bẫy'],
+    [/Spell Card/gi, 'Lá Phép'],
+    [/Trap Card/gi, 'Lá Bẫy'],
+    [/Monster Card/gi, 'Quái thú']
+  ];
+  glossary.forEach(([pattern, replacement]) => {
+    fallback = fallback.replace(pattern, replacement);
+  });
+  return fallback;
+}
+
+// API Dịch hiệu ứng lá bài sang tiếng Việt (hoặc lấy bản dịch đã cache trong DB)
+exports.translateCardEffect = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const force = req.query.force === 'true' || req.body?.force === true;
+
+    const card = await Card.findOne({ id: Number(id) });
+    if (!card) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy thẻ bài' });
+    }
+
+    // Nếu đã có bản dịch và không yêu cầu ép dịch lại
+    if (card.desc_vi && card.desc_vi.trim() !== '' && !force) {
+      return res.json({
+        success: true,
+        desc_vi: card.desc_vi,
+        from_cache: true
+      });
+    }
+
+    if (!card.desc || !card.desc.trim()) {
+      return res.json({
+        success: true,
+        desc_vi: 'Lá bài này không có mô tả hoặc hiệu ứng.',
+        from_cache: true
+      });
+    }
+
+    // Thực hiện dịch qua pipeline đa tầng
+    const translated = await translateToVietnamese(card.desc);
+
+    // Lưu vào database để lần sau lấy ngay lập tức
+    if (translated && translated.trim()) {
+      card.desc_vi = translated;
+      await card.save();
+    }
+
+    return res.json({
+      success: true,
+      desc_vi: translated || card.desc,
+      from_cache: false
+    });
+  } catch (error) {
+    console.error('[translateCardEffect error]', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Không thể dịch hiệu ứng thẻ bài vào lúc này: ' + error.message
+    });
+  }
+};
+
 // Đọc dữ liệu lịch sử Banlist chính thức từ YGOPRODeck (TCG, OCG, Master Duel)
 const allBanlistsPath = path.join(__dirname, '../data/ygoprodeck_all_banlists.json');
 let ALL_BANLISTS = { TCG: {}, OCG: {}, 'Master Duel': {} };

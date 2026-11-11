@@ -164,7 +164,7 @@ exports.getDeckById = async (req, res) => {
     ];
 
     const cardsInDb = await Card.find({ id: { $in: allCardIds } })
-      .select('id name banlist_info desc type attribute race level atk def')
+      .select('id name banlist_info desc desc_vi type attribute race level atk def')
       .lean();
 
     const cardInfoMap = new Map();
@@ -202,6 +202,7 @@ exports.getDeckById = async (req, res) => {
         ban_status,
         banlist_info: banInfo,
         desc: dbInfo?.desc || '',
+        desc_vi: dbInfo?.desc_vi || '',
         attribute: dbInfo?.attribute,
         race: dbInfo?.race,
         level: dbInfo?.level,

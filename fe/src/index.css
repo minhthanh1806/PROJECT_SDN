@@ -767,12 +767,114 @@ button.nav-header-btn {
   border-radius: 12px;
   padding: 1.25rem;
   margin-bottom: 2rem;
+  position: relative;
+}
+
+.desc-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .desc-title {
   font-size: 1rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Lang Toggle Group */
+.lang-toggle-group {
+  display: inline-flex;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  gap: 3px;
+}
+
+.lang-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lang-btn:hover:not(:disabled) {
+  color: var(--text-primary);
+}
+
+.lang-btn.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.35);
+}
+
+.lang-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+/* Translation notice bar */
+.trans-notice-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 8px;
+  padding: 0.45rem 0.85rem;
+  margin-bottom: 0.85rem;
+  font-size: 0.82rem;
+  color: #34d399;
+  font-weight: 500;
+}
+
+.retranslate-btn {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #6ee7b7;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.2s;
+}
+
+.retranslate-btn:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.3);
+  color: #a7f3d0;
+}
+
+.trans-error-box {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #f87171;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  margin-bottom: 0.75rem;
 }
 
 .desc-content {
@@ -780,6 +882,72 @@ button.nav-header-btn {
   white-space: pre-line;
   line-height: 1.6;
   color: var(--text-primary);
+}
+
+/* Sidebar preview card description wrap in DeckDetailPage */
+.preview-desc-wrap {
+  margin: 0.75rem 0;
+  padding: 0.65rem 0.75rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  text-align: left;
+}
+
+.preview-desc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.preview-desc-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.preview-lang-pills {
+  display: inline-flex;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px;
+  border-radius: 4px;
+  gap: 2px;
+}
+
+.preview-lang-btn {
+  background: transparent;
+  border: none;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.preview-lang-btn.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.preview-desc-text {
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+  max-height: 140px;
+  overflow-y: auto;
+  white-space: pre-line;
+  padding-right: 4px;
+}
+
+.spin {
+  animation: spinAnim 1s linear infinite;
+}
+
+@keyframes spinAnim {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* Price Widget */

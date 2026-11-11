@@ -24,6 +24,7 @@ API.interceptors.request.use((config) => {
 export const getCards = (params) => API.get('/cards', { params });
 export const getSampleBannedCards = (params) => API.get('/cards/sample/banned', { params });
 export const getCardById = (id) => API.get(`/cards/${id}`);
+export const translateCardEffect = (id, force = false) => API.get(`/cards/${id}/translate${force ? '?force=true' : ''}`);
 
 // Auth & User Profile
 export const registerUser = (data) => API.post('/auth/register', data);
