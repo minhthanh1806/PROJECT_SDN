@@ -142,7 +142,7 @@
         <mxCell id="c_wf_lookup_9" value="Any cards&lt;br&gt;found?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11;strokeWidth=1.15;" vertex="1" parent="c_wf_lookup_4">
           <mxGeometry x="416" y="30" width="96" height="72" as="geometry" />
         </mxCell>
-        <mxCell id="c_wf_lookup_10" value="Render Paginated&lt;br&gt;Card Grid (24/page)" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11.5;strokeWidth=1.15;" vertex="1" parent="c_wf_lookup_4">
+        <mxCell id="c_wf_lookup_10" value="Render Paginated&lt;br&gt;Card Grid (12/page)" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11.5;strokeWidth=1.15;" vertex="1" parent="c_wf_lookup_4">
           <mxGeometry x="566" y="38" width="136" height="56" as="geometry" />
         </mxCell>
         <mxCell id="c_wf_lookup_11" value="Select Meta Card&lt;br&gt;&amp; Open /card/:id" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11.5;strokeWidth=1.15;" vertex="1" parent="c_wf_lookup_3">
@@ -453,10 +453,10 @@
         <mxCell id="c_wf_auth_9" value="Valid&lt;br&gt;creds?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11;strokeWidth=1.15;" vertex="1" parent="c_wf_auth_4">
           <mxGeometry x="406" y="30" width="96" height="72" as="geometry" />
         </mxCell>
-        <mxCell id="c_wf_auth_10" value="Sign 7-Day JWT &amp;&lt;br&gt;Return User Profile" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11.5;strokeWidth=1.15;" vertex="1" parent="c_wf_auth_4">
+        <mxCell id="c_wf_auth_10" value="Return User Profile&lt;br&gt;&amp; Role Session" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11.5;strokeWidth=1.15;" vertex="1" parent="c_wf_auth_4">
           <mxGeometry x="576" y="38" width="132" height="56" as="geometry" />
         </mxCell>
-        <mxCell id="c_wf_auth_11" value="Store JWT Session&lt;br&gt;&amp; Open /profile" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11.5;strokeWidth=1.15;" vertex="1" parent="c_wf_auth_3">
+        <mxCell id="c_wf_auth_11" value="Save User Session&lt;br&gt;&amp; Open /profile" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11.5;strokeWidth=1.15;" vertex="1" parent="c_wf_auth_3">
           <mxGeometry x="576" y="65" width="132" height="56" as="geometry" />
         </mxCell>
         <mxCell id="c_wf_auth_12" value="Click Heart Icon&lt;br&gt;(Toggle Favorite)" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11.5;strokeWidth=1.15;" vertex="1" parent="c_wf_auth_3">
@@ -549,7 +549,7 @@
         <mxCell id="c_wf_admin_6" value="Login &amp; Navigate&lt;br&gt;to /admin Panel" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11.5;strokeWidth=1.15;" vertex="1" parent="c_wf_admin_3">
           <mxGeometry x="94" y="65" width="130" height="56" as="geometry" />
         </mxCell>
-        <mxCell id="c_wf_admin_7" value="requireAdmin()&lt;br&gt;Verify JWT &amp; Role" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11.5;strokeWidth=1.15;" vertex="1" parent="c_wf_admin_4">
+        <mxCell id="c_wf_admin_7" value="requireAdmin()&lt;br&gt;Check x-admin-id" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11.5;strokeWidth=1.15;" vertex="1" parent="c_wf_admin_4">
           <mxGeometry x="94" y="38" width="130" height="56" as="geometry" />
         </mxCell>
         <mxCell id="c_wf_admin_8" value="Role =&lt;br&gt;admin?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11;strokeWidth=1.15;" vertex="1" parent="c_wf_admin_4">

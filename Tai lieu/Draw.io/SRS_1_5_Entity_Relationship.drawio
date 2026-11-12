@@ -253,7 +253,7 @@
         <mxCell id="c_erd_84" value="FK" style="shape=partialRectangle;connectable=0;fillColor=#ffffff;fontStyle=1;fontSize=11;align=center;fontColor=#000000;strokeColor=#000000;" vertex="1" parent="c_erd_83">
           <mxGeometry width="40" height="22" as="geometry" />
         </mxCell>
-        <mxCell id="c_erd_85" value="main_deck : [{ card_id, name, count }]" style="shape=partialRectangle;connectable=0;fillColor=#ffffff;align=left;spacingLeft=6;fontSize=12;fontColor=#000000;strokeColor=#000000;" vertex="1" parent="c_erd_83">
+        <mxCell id="c_erd_85" value="main_deck : [{ card_id, name, quantity }]" style="shape=partialRectangle;connectable=0;fillColor=#ffffff;align=left;spacingLeft=6;fontSize=12;fontColor=#000000;strokeColor=#000000;" vertex="1" parent="c_erd_83">
           <mxGeometry x="40" width="250" height="22" as="geometry" />
         </mxCell>
         <mxCell id="c_erd_86" value="" style="shape=tableRow;horizontal=0;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="c_erd_64">
@@ -262,7 +262,7 @@
         <mxCell id="c_erd_87" value="FK" style="shape=partialRectangle;connectable=0;fillColor=#ffffff;fontStyle=1;fontSize=11;align=center;fontColor=#000000;strokeColor=#000000;" vertex="1" parent="c_erd_86">
           <mxGeometry width="40" height="22" as="geometry" />
         </mxCell>
-        <mxCell id="c_erd_88" value="extra_deck : [{ card_id, name, count }]" style="shape=partialRectangle;connectable=0;fillColor=#ffffff;align=left;spacingLeft=6;fontSize=12;fontColor=#000000;strokeColor=#000000;" vertex="1" parent="c_erd_86">
+        <mxCell id="c_erd_88" value="extra_deck : [{ card_id, name, quantity }]" style="shape=partialRectangle;connectable=0;fillColor=#ffffff;align=left;spacingLeft=6;fontSize=12;fontColor=#000000;strokeColor=#000000;" vertex="1" parent="c_erd_86">
           <mxGeometry x="40" width="250" height="22" as="geometry" />
         </mxCell>
         <mxCell id="c_erd_89" value="" style="shape=tableRow;horizontal=0;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="c_erd_64">
@@ -271,7 +271,7 @@
         <mxCell id="c_erd_90" value="FK" style="shape=partialRectangle;connectable=0;fillColor=#ffffff;fontStyle=1;fontSize=11;align=center;fontColor=#000000;strokeColor=#000000;" vertex="1" parent="c_erd_89">
           <mxGeometry width="40" height="22" as="geometry" />
         </mxCell>
-        <mxCell id="c_erd_91" value="side_deck : [{ card_id, name, count }]" style="shape=partialRectangle;connectable=0;fillColor=#ffffff;align=left;spacingLeft=6;fontSize=12;fontColor=#000000;strokeColor=#000000;" vertex="1" parent="c_erd_89">
+        <mxCell id="c_erd_91" value="side_deck : [{ card_id, name, quantity }]" style="shape=partialRectangle;connectable=0;fillColor=#ffffff;align=left;spacingLeft=6;fontSize=12;fontColor=#000000;strokeColor=#000000;" vertex="1" parent="c_erd_89">
           <mxGeometry x="40" width="250" height="22" as="geometry" />
         </mxCell>
         <mxCell id="c_erd_92" value="" style="shape=tableRow;horizontal=0;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="c_erd_64">
