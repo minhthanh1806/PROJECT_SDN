@@ -137,7 +137,7 @@ export default function HomePage() {
           }}
         >
           <span>
-            Đang hiển thị: <strong>{cards.length}</strong> / <strong>{totalCards.toLocaleString()}</strong> lá bài
+            Đang hiển thị: <strong>{cards.length}</strong> / <strong>{totalCards.toLocaleString()}</strong> lá bài Meta hiện tại
           </span>
           <span>
             Trang <strong>{currentPage}</strong> / {totalPages.toLocaleString()} ({CARDS_PER_PAGE} thẻ/trang)

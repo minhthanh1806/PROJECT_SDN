@@ -1,0 +1,230 @@
+[
+  {
+    "_id": "6ae76c85dff0487b6ad1a51a",
+    "username": "MinhTien",
+    "password": "35115c4c94f90b0024721539970c3ca3:05b0f5689e200de21e4a734d112b8b6a579932a13df6c2c9b4fb3d161f2e1787ecd9b32a5f8a8d8367142efc258e74662f9041fcd6e8e78c700c1368d5f34b12",
+    "createdAt": "2026-11-01T16:44:53.742Z",
+    "updatedAt": "2026-11-01T16:54:13.785Z",
+    "__v": 2,
+    "favorites": [],
+    "role": "admin"
+  },
+  {
+    "_id": "6af207abcfd87afcd1b4c981",
+    "username": "admin",
+    "password": "3f44cfd0dffa13a14d21cfba4894d3e4:d9b87d2fd5f6c86cb571e808105d7ca5a460adfbb24275183b32dbb16c597016f8f241ed23368e10bd0e36b4ee23b3a59f3e28ff0dc667ec15f41ae824369ff1",
+    "role": "admin",
+    "favorites": [],
+    "__v": 0
+  },
+  {
+    "_id": "6af48411e011553eb9693ec1",
+    "username": "JesseKotton",
+    "password": "88c874142524dd0117828bf665cb0edf:43412e4ed674d0c31434a8a8b11cfc645a30514acccba47f273b483cd234ec3a19b7ebbed01cc418b4495f76b69c97416e6c03152aca0beca7d89660a312afcd",
+    "role": "user",
+    "favorites": [
+      14558127,
+      23434538,
+      84815190
+    ],
+    "createdAt": "2026-11-11T15:04:49.627Z",
+    "updatedAt": "2026-11-11T15:04:49.627Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af48411e011553eb9693ec5",
+    "username": "JoshuaSchmidt",
+    "password": "779b63d7459e9e331e9917af349bc333:de7df99c9ba1a94626eaea3f76172d9a33e5f88ea6bcd20f544ce8f96b0f1e810cb53e1d81d5ae743f2a2e82eff441787388c5c78435d960b57357816b2a1b17",
+    "role": "user",
+    "favorites": [
+      9674034,
+      72270339,
+      29301450
+    ],
+    "createdAt": "2026-11-11T15:04:49.825Z",
+    "updatedAt": "2026-11-11T15:04:49.825Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af48412e011553eb9693ecd",
+    "username": "Pakawat_YGO",
+    "password": "2e1be1ec8f2b3d06d1d15a6d93b1ba0d:93c8de3be68e83979841cff0706102c61075a01b159085cd6256deafb15b65e5364ba00944013368ac18f8506fba2211a72c5c52067175fc7df72b8b696e68af",
+    "role": "user",
+    "favorites": [
+      32909498,
+      48626373,
+      68304193
+    ],
+    "createdAt": "2026-11-11T15:04:50.031Z",
+    "updatedAt": "2026-11-11T15:04:50.031Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af48412e011553eb9693ed4",
+    "username": "KaibaBoy",
+    "password": "f18e33bac3b7ec066c99a0c00c2c5fcd:9c045badfc5f1ed3253fcf55d0adfea56f60b40c5010fb18a8bc3dbc28719d8f0e6fe67a82722acfc49d933db80ab919dc1cb07010ac0f2620904e53a80144a8",
+    "role": "user",
+    "favorites": [
+      89631139,
+      70095154,
+      83764719
+    ],
+    "createdAt": "2026-11-11T15:04:50.239Z",
+    "updatedAt": "2026-11-11T15:04:50.239Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af48412e011553eb9693ed9",
+    "username": "YugiDuelist",
+    "password": "c66a97129ce1615977e55d89ee5af61e:1a0ee51b56f8b91cb48f6122be014985e9012f0ba1041a1c052dde09c983320b051f26bce481fa40e09e68b0839d10f51c0d8e86559b038ed03873d3ed40f068",
+    "role": "user",
+    "favorites": [
+      46986414,
+      38033121,
+      33396948
+    ],
+    "createdAt": "2026-11-11T15:04:50.423Z",
+    "updatedAt": "2026-11-11T15:04:50.423Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af48412e011553eb9693ede",
+    "username": "NguyenVanAn",
+    "password": "fef9d3b60989d49550c1047499b8a844:1102568ec5f50d1bee504a9764982ad62ac36808e0285d9bb85c8202b22626b868272ccd166e6b5bc429410da7748d15b4e3574ce2ebf2d9975c51d8bedcf100",
+    "role": "user",
+    "favorites": [
+      91810826,
+      39931513,
+      66730191
+    ],
+    "createdAt": "2026-11-11T15:04:50.597Z",
+    "updatedAt": "2026-11-11T15:04:50.597Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af48412e011553eb9693ee3",
+    "username": "TranThiMai",
+    "password": "cbfd98c74283ff134c21bc82172d1965:5b35dd238ce68d35d9edb2939444d1f3fa69aa9d61a2a2ef2930de0603a86056526464604e2e9c67d2e1caac009ad1f17fbbc0f4a2e662dcac89d778d1262170",
+    "role": "user",
+    "favorites": [
+      572850,
+      37961969,
+      92731385
+    ],
+    "createdAt": "2026-11-11T15:04:50.738Z",
+    "updatedAt": "2026-11-11T15:04:50.738Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af48412e011553eb9693ee7",
+    "username": "LeHoangNam",
+    "password": "31f1fccbf305bc6ed03250c14035f459:9f75ce8490f5d846875bdfaa57cb8eb41beea3f97128513ace4d6d862ab6d1db77fc76b70de90c41581082bbb2e205a007c219f35c72b88595d192bdd6ee818c",
+    "role": "user",
+    "favorites": [
+      10045474,
+      41420027,
+      15693423
+    ],
+    "createdAt": "2026-11-11T15:04:50.896Z",
+    "updatedAt": "2026-11-11T15:04:50.896Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af48413e011553eb9693eea",
+    "username": "MasterDuelKing",
+    "password": "74da3f42d201ce4eafd89a304a90b5ba:0e7130e87cddfbc572b86f7636633d098ba3ad99c2fa0b7329be5a26f6e1706f289c37a520544a7b9f9c990b2a21dae58950476485fde615c9a285800a9b3034",
+    "role": "user",
+    "favorites": [
+      23434538,
+      14558127,
+      27204311
+    ],
+    "createdAt": "2026-11-11T15:04:51.024Z",
+    "updatedAt": "2026-11-11T15:04:51.024Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af48413e011553eb9693eed",
+    "username": "ShadowDuelist",
+    "password": "2063a4e837b97cef9910aac1f76585de:8f3c381989d16cf9d62f4548e9bfce5817df2b4df5061fbc0f1faabbb7d4b80d915fc3e265b790f662b847b0bad07390e686dc202b527cbb6fdb5347e422ddf1",
+    "role": "user",
+    "favorites": [
+      10000000,
+      10000010,
+      10000020
+    ],
+    "createdAt": "2026-11-11T15:04:51.207Z",
+    "updatedAt": "2026-11-11T15:04:51.207Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af48413e011553eb9693ef0",
+    "username": "CyberDragonFan",
+    "password": "7af016f7176a3a2166308b97451189fc:b4dff40cf611a6a89a9d28fb5808242cf1a2dccaf5e58a94fbcf6ef96669ed52443be78190cac774ea1c4723846c9dda6e759874f8f6367292ec1a4e0f105bde",
+    "role": "user",
+    "favorites": [
+      70095154,
+      86066372,
+      84013237
+    ],
+    "createdAt": "2026-11-11T15:04:51.347Z",
+    "updatedAt": "2026-11-11T15:04:51.347Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af48413e011553eb9693ef3",
+    "username": "AkizaRose",
+    "password": "8d3dab3444daff02cd13b441ffd9941c:50b5788ab9b80a2c3a25342a2196d31044679fa21d37dea47b539aae36218bc7b1762aa6c922a9cfb4041807e47e602932d058001b465793b28b7cbd12963c35",
+    "role": "user",
+    "favorites": [
+      73580471,
+      44508094,
+      27548199
+    ],
+    "createdAt": "2026-11-11T15:04:51.518Z",
+    "updatedAt": "2026-11-11T15:04:51.518Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af48413e011553eb9693ef6",
+    "username": "SoulburnerX",
+    "password": "8ce277fc376269f1b1a02b0e0ea97c17:77002ed673315e5f9a59b4bf1776e7b7019059c75f86d18acc0f4c26c159fbc7e3aa51f52a4bc42887dbe50529a65bb9a29101651b68c14b4c87aba12204ed12",
+    "role": "user",
+    "favorites": [
+      2772337,
+      65741786,
+      86066372
+    ],
+    "createdAt": "2026-11-11T15:04:51.690Z",
+    "updatedAt": "2026-11-11T15:04:51.690Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af48413e011553eb9693ef9",
+    "username": "JoeyTheLuck",
+    "password": "d3949c0faad5d4b86fdcf04bf46f5972:5df5147368ed609ee804e1e221fbd24f9414f56935394d1a47145f3d218862eb04489e1cdf6f1bd4d8c0dbac3dc83b79f2362d58bbc2cf94d90ffc7a57194194",
+    "role": "user",
+    "favorites": [
+      74677422,
+      12580477,
+      44095762
+    ],
+    "createdAt": "2026-11-11T15:04:51.840Z",
+    "updatedAt": "2026-11-11T15:04:51.840Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af48413e011553eb9693efc",
+    "username": "YGO_Judge_Hanoi",
+    "password": "0062f1dfa3f050a0cf446d0f85e2b194:748c19973468d9b55de88dad949595192f17591bf991ff4f332ab77d67c2ee634d2060eeb3e495aba7a24b07164b5a704284271c99a1f0fb8a90578af87c3363",
+    "role": "admin",
+    "favorites": [
+      41420027,
+      40605147,
+      84749824
+    ],
+    "createdAt": "2026-11-11T15:04:51.957Z",
+    "updatedAt": "2026-11-11T15:04:51.957Z",
+    "__v": 0
+  }
+]

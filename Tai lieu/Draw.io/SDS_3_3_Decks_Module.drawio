@@ -1,0 +1,174 @@
+<mxfile host="app.diagrams.net" modified="2026-11-13T08:35:00.000Z" agent="YGO-DocGen" version="24.7.17" type="device">
+  <diagram id="diag_cls_deck" name="3.3.1 Class Diagram - Deck Module">
+    <mxGraphModel dx="1420" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1240" pageHeight="500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="c_cls_deck_2" value="DecksPage / DeckDetailPage" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="30" y="35" width="280" height="151" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_3" value="- decks: Deck[]&lt;br&gt;- activeDeck: Deck" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_deck_2">
+          <mxGeometry y="30" width="280" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_4" value="" style="line;strokeWidth=1;fillColor=none;strokeColor=#000000;" vertex="1" parent="c_cls_deck_2">
+          <mxGeometry y="78" width="280" height="6" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_5" value="+ filterDecks()&lt;br&gt;+ handleLikeDeck()&lt;br&gt;+ handleExportYdk()" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_deck_2">
+          <mxGeometry y="84" width="280" height="67" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_6" value="deckController" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="475" y="35" width="290" height="151" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_7" value="- PAGE_SIZE: Number" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_deck_6">
+          <mxGeometry y="30" width="290" height="29" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_8" value="" style="line;strokeWidth=1;fillColor=none;strokeColor=#000000;" vertex="1" parent="c_cls_deck_6">
+          <mxGeometry y="59" width="290" height="6" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_9" value="+ getDeckMeta(req, res)&lt;br&gt;+ getDecks(req, res)&lt;br&gt;+ getDeckById(req, res)&lt;br&gt;+ likeDeck(req, res)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_deck_6">
+          <mxGeometry y="65" width="290" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_10" value="Deck (Model)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="925" y="35" width="285" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_11" value="+ _id: ObjectId&lt;br&gt;+ name, slug: String&lt;br&gt;+ category, format: String&lt;br&gt;+ cover_card_id: Number&lt;br&gt;+ stats, views, likes" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_deck_10">
+          <mxGeometry y="30" width="285" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_12" value="" style="line;strokeWidth=1;fillColor=none;strokeColor=#000000;" vertex="1" parent="c_cls_deck_10">
+          <mxGeometry y="135" width="285" height="6" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_13" value="+ computeTotalPrice()" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_deck_10">
+          <mxGeometry y="141" width="285" height="29" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_14" value="YdkExporter" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="30" y="310" width="280" height="113" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_15" value="- sections: Main/Extra/Side" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_deck_14">
+          <mxGeometry y="30" width="280" height="29" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_16" value="" style="line;strokeWidth=1;fillColor=none;strokeColor=#000000;" vertex="1" parent="c_cls_deck_14">
+          <mxGeometry y="59" width="280" height="6" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_17" value="+ buildYdkText(deck)&lt;br&gt;+ downloadFile(slug)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_deck_14">
+          <mxGeometry y="65" width="280" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_18" value="DeckCardEntry" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="475" y="310" width="290" height="132" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_19" value="+ card_id: Number&lt;br&gt;+ name: String&lt;br&gt;+ count: Number (1..3)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_deck_18">
+          <mxGeometry y="30" width="290" height="67" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_20" value="" style="line;strokeWidth=1;fillColor=none;strokeColor=#000000;" vertex="1" parent="c_cls_deck_18">
+          <mxGeometry y="97" width="290" height="6" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_21" value="+ sumPrice(prices)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_deck_18">
+          <mxGeometry y="103" width="290" height="29" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_22" value="Card (Model)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="925" y="310" width="285" height="132" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_23" value="+ id: Number (Passcode)&lt;br&gt;+ name, type: String&lt;br&gt;+ min_price: Number" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_deck_22">
+          <mxGeometry y="30" width="285" height="67" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_24" value="" style="line;strokeWidth=1;fillColor=none;strokeColor=#000000;" vertex="1" parent="c_cls_deck_22">
+          <mxGeometry y="97" width="285" height="6" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_25" value="+ resolveMetadata()" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_deck_22">
+          <mxGeometry y="103" width="285" height="29" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_deck_26" value="&lt;&lt;HTTP /decks&gt;&gt;" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.45;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;rounded=0;html=1;dashed=1;endArrow=open;endFill=0;strokeColor=#000000;fontColor=#000000;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.2;" edge="1" parent="1" source="c_cls_deck_2" target="c_cls_deck_6">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="392" y="102" />
+              <mxPoint x="392" y="110" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_cls_deck_27" value="&lt;&lt;uses&gt;&gt;" style="edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;rounded=0;html=1;dashed=1;endArrow=open;endFill=0;strokeColor=#000000;fontColor=#000000;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.2;" edge="1" parent="1" source="c_cls_deck_2" target="c_cls_deck_14">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_cls_deck_28" value="queries / $inc" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.45;entryDx=0;entryDy=0;rounded=0;html=1;endArrow=open;endFill=0;strokeColor=#000000;fontColor=#000000;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.2;" edge="1" parent="1" source="c_cls_deck_6" target="c_cls_deck_10">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="845" y="110" />
+              <mxPoint x="845" y="111" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_cls_deck_29" value="composes (1..*)" style="edgeStyle=orthogonalEdgeStyle;exitX=0.28;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;rounded=0;html=1;startArrow=diamondThin;startFill=1;startSize=12;endArrow=open;endFill=0;strokeColor=#000000;fontColor=#000000;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.2;" edge="1" parent="1" source="c_cls_deck_10" target="c_cls_deck_18">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1004" y="265" />
+              <mxPoint x="620" y="265" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_cls_deck_30" value="refs card_id (1)" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;rounded=0;html=1;endArrow=open;endFill=0;strokeColor=#000000;fontColor=#000000;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.2;" edge="1" parent="1" source="c_cls_deck_18" target="c_cls_deck_22">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_cls_deck_31" value="cover_card (1)" style="edgeStyle=orthogonalEdgeStyle;exitX=0.72;exitY=1;exitDx=0;exitDy=0;entryX=0.72;entryY=0;entryDx=0;entryDy=0;rounded=0;html=1;startArrow=diamondThin;startFill=0;startSize=12;endArrow=open;endFill=0;strokeColor=#000000;fontColor=#000000;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.2;" edge="1" parent="1" source="c_cls_deck_10" target="c_cls_deck_22">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="diag_seq_deck" name="3.3.2 Sequence - Deck Detail, Like &amp; .ydk">
+    <mxGraphModel dx="1420" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1120" pageHeight="408" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="c_seq_deck_2" value="Browser" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=12;size=36;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="20" y="35" width="140" height="353" as="geometry" />
+        </mxCell>
+        <mxCell id="c_seq_deck_3" value="DeckDetailPage" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=12;size=36;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="333" y="35" width="140" height="353" as="geometry" />
+        </mxCell>
+        <mxCell id="c_seq_deck_4" value="deckController" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=12;size=36;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="646" y="35" width="140" height="353" as="geometry" />
+        </mxCell>
+        <mxCell id="c_seq_deck_5" value="MongoDB" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=12;size=36;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="959" y="35" width="140" height="353" as="geometry" />
+        </mxCell>
+        <mxCell id="c_seq_deck_6" value="1. Open /deck/:id" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="90" y="105" as="sourcePoint" />
+            <mxPoint x="403" y="105" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_seq_deck_7" value="2. GET /api/decks/:id" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="403" y="151" as="sourcePoint" />
+            <mxPoint x="716" y="151" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_seq_deck_8" value="3. Find Deck &amp; resolve cards" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="716" y="197" as="sourcePoint" />
+            <mxPoint x="1029" y="197" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_seq_deck_9" value="4. Populated Deck" style="html=1;verticalAlign=bottom;dashed=1;endArrow=open;endFill=0;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1029" y="243" as="sourcePoint" />
+            <mxPoint x="716" y="243" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_seq_deck_10" value="5. Render Main/Extra/Side" style="html=1;verticalAlign=bottom;dashed=1;endArrow=open;endFill=0;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="716" y="289" as="sourcePoint" />
+            <mxPoint x="403" y="289" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_seq_deck_11" value="6. Like or Export .ydk" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="90" y="335" as="sourcePoint" />
+            <mxPoint x="403" y="335" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

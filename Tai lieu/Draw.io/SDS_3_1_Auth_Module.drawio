@@ -1,0 +1,220 @@
+<mxfile host="app.diagrams.net" modified="2026-11-13T08:35:00.000Z" agent="YGO-DocGen" version="24.7.17" type="device">
+  <diagram id="diag_cls_auth" name="3.1.1 Class Diagram - Auth Module">
+    <mxGraphModel dx="1420" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1240" pageHeight="500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="c_cls_auth_2" value="AuthPage / ProfilePage" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="30" y="35" width="280" height="208" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_3" value="- username: String&lt;br&gt;- password: String&lt;br&gt;- token: String&lt;br&gt;- favorites: Card[]" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_auth_2">
+          <mxGeometry y="30" width="280" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_4" value="" style="line;strokeWidth=1;fillColor=none;strokeColor=#000000;" vertex="1" parent="c_cls_auth_2">
+          <mxGeometry y="116" width="280" height="6" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_5" value="+ handleLogin()&lt;br&gt;+ handleRegister()&lt;br&gt;+ toggleFavorite()&lt;br&gt;+ changePassword()" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_auth_2">
+          <mxGeometry y="122" width="280" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_6" value="authController" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="475" y="35" width="290" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_7" value="- JWT_SECRET: String" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_auth_6">
+          <mxGeometry y="30" width="290" height="29" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_8" value="" style="line;strokeWidth=1;fillColor=none;strokeColor=#000000;" vertex="1" parent="c_cls_auth_6">
+          <mxGeometry y="59" width="290" height="6" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_9" value="+ register(req, res)&lt;br&gt;+ login(req, res)&lt;br&gt;+ getProfile(req, res)&lt;br&gt;+ changePassword(req, res)&lt;br&gt;+ toggleFavorite(req, res)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_auth_6">
+          <mxGeometry y="65" width="290" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_10" value="User (Model)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="925" y="35" width="285" height="189" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_11" value="+ _id: ObjectId&lt;br&gt;+ username: String&lt;br&gt;+ password: String&lt;br&gt;+ role: &#x27;user&#x27; | &#x27;admin&#x27;&lt;br&gt;+ favorites: Number[]" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_auth_10">
+          <mxGeometry y="30" width="285" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_12" value="" style="line;strokeWidth=1;fillColor=none;strokeColor=#000000;" vertex="1" parent="c_cls_auth_10">
+          <mxGeometry y="135" width="285" height="6" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_13" value="+ hashPassword()&lt;br&gt;+ verifyPassword()" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_auth_10">
+          <mxGeometry y="141" width="285" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_14" value="authMiddleware" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="30" y="325" width="280" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_15" value="- bearerHeader: String" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_auth_14">
+          <mxGeometry y="30" width="280" height="29" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_16" value="" style="line;strokeWidth=1;fillColor=none;strokeColor=#000000;" vertex="1" parent="c_cls_auth_14">
+          <mxGeometry y="59" width="280" height="6" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_17" value="+ requireAdmin(req, res, next)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_auth_14">
+          <mxGeometry y="65" width="280" height="29" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_18" value="Card (Model)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="925" y="300" width="285" height="151" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_19" value="+ id: Number (Passcode)&lt;br&gt;+ name, type: String&lt;br&gt;+ min_price: Number&lt;br&gt;+ card_images: Object[]" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_auth_18">
+          <mxGeometry y="30" width="285" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_20" value="" style="line;strokeWidth=1;fillColor=none;strokeColor=#000000;" vertex="1" parent="c_cls_auth_18">
+          <mxGeometry y="116" width="285" height="6" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_21" value="+ findByPasscode()" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_auth_18">
+          <mxGeometry y="122" width="285" height="29" as="geometry" />
+        </mxCell>
+        <mxCell id="c_cls_auth_22" value="&lt;&lt;REST /auth&gt;&gt;" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.41;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;rounded=0;html=1;dashed=1;endArrow=open;endFill=0;strokeColor=#000000;fontColor=#000000;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.2;" edge="1" parent="1" source="c_cls_auth_2" target="c_cls_auth_6">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_cls_auth_23" value="manages (1..*)" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.55;exitDx=0;exitDy=0;entryX=0;entryY=0.49;entryDx=0;entryDy=0;rounded=0;html=1;endArrow=open;endFill=0;strokeColor=#000000;fontColor=#000000;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.2;" edge="1" parent="1" source="c_cls_auth_6" target="c_cls_auth_10">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_cls_auth_24" value="favorites (0..*)" style="edgeStyle=orthogonalEdgeStyle;exitX=0.72;exitY=1;exitDx=0;exitDy=0;entryX=0.72;entryY=0;entryDx=0;entryDy=0;rounded=0;html=1;startArrow=diamondThin;startFill=0;startSize=12;endArrow=open;endFill=0;strokeColor=#000000;fontColor=#000000;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.2;" edge="1" parent="1" source="c_cls_auth_10" target="c_cls_auth_18">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_cls_auth_25" value="&lt;&lt;populates&gt;&gt;" style="edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;rounded=0;html=1;dashed=1;endArrow=open;endFill=0;strokeColor=#000000;fontColor=#000000;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.2;" edge="1" parent="1" source="c_cls_auth_6" target="c_cls_auth_18">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="620" y="375" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_cls_auth_26" value="&lt;&lt;verifies role&gt;&gt; (1)" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.28;entryY=1;entryDx=0;entryDy=0;rounded=0;html=1;dashed=1;endArrow=open;endFill=0;strokeColor=#000000;fontColor=#000000;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.2;" edge="1" parent="1" source="c_cls_auth_14" target="c_cls_auth_10">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="395" y="372" />
+              <mxPoint x="395" y="381" />
+              <mxPoint x="395" y="262" />
+              <mxPoint x="1005" y="262" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="diag_seq_auth" name="3.1.2 Sequence - Login &amp; Register">
+    <mxGraphModel dx="1420" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1120" pageHeight="456" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="c_seq_auth_2" value="Browser" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=12;size=36;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="20" y="35" width="140" height="401" as="geometry" />
+        </mxCell>
+        <mxCell id="c_seq_auth_3" value="AuthPage" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=12;size=36;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="255" y="35" width="140" height="401" as="geometry" />
+        </mxCell>
+        <mxCell id="c_seq_auth_4" value="authRoutes" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=12;size=36;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="490" y="35" width="140" height="401" as="geometry" />
+        </mxCell>
+        <mxCell id="c_seq_auth_5" value="authController" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=12;size=36;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="725" y="35" width="140" height="401" as="geometry" />
+        </mxCell>
+        <mxCell id="c_seq_auth_6" value="MongoDB" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=12;size=36;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="960" y="35" width="140" height="401" as="geometry" />
+        </mxCell>
+        <mxCell id="c_seq_auth_7" value="1. Submit credentials" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="90" y="105" as="sourcePoint" />
+            <mxPoint x="325" y="105" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_seq_auth_8" value="2. POST /api/auth/login" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="325" y="151" as="sourcePoint" />
+            <mxPoint x="560" y="151" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_seq_auth_9" value="3. login()" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="560" y="197" as="sourcePoint" />
+            <mxPoint x="795" y="197" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_seq_auth_10" value="4. findOne() + scrypt verify" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="795" y="243" as="sourcePoint" />
+            <mxPoint x="1030" y="243" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_seq_auth_11" value="5. User doc" style="html=1;verticalAlign=bottom;dashed=1;endArrow=open;endFill=0;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1030" y="289" as="sourcePoint" />
+            <mxPoint x="795" y="289" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_seq_auth_12" value="6. 200 OK { token, user }" style="html=1;verticalAlign=bottom;dashed=1;endArrow=open;endFill=0;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="795" y="335" as="sourcePoint" />
+            <mxPoint x="325" y="335" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_seq_auth_13" value="7. Save JWT &amp; redirect" style="html=1;verticalAlign=bottom;dashed=1;endArrow=open;endFill=0;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="325" y="381" as="sourcePoint" />
+            <mxPoint x="90" y="381" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="diag_seq_fav" name="3.1.3 Sequence - Toggle Favorite">
+    <mxGraphModel dx="1420" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1120" pageHeight="408" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="c_seq_fav_2" value="Browser" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=12;size=36;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="20" y="35" width="140" height="353" as="geometry" />
+        </mxCell>
+        <mxCell id="c_seq_fav_3" value="CardDetail/Profile" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=12;size=36;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="333" y="35" width="140" height="353" as="geometry" />
+        </mxCell>
+        <mxCell id="c_seq_fav_4" value="authController" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=12;size=36;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="646" y="35" width="140" height="353" as="geometry" />
+        </mxCell>
+        <mxCell id="c_seq_fav_5" value="MongoDB" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=12;size=36;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="959" y="35" width="140" height="353" as="geometry" />
+        </mxCell>
+        <mxCell id="c_seq_fav_6" value="1. Click Heart icon" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="90" y="105" as="sourcePoint" />
+            <mxPoint x="403" y="105" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_seq_fav_7" value="2. POST /api/auth/favorite/:userId" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="403" y="151" as="sourcePoint" />
+            <mxPoint x="716" y="151" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_seq_fav_8" value="3. Toggle cardId in favorites[]" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="716" y="197" as="sourcePoint" />
+            <mxPoint x="1029" y="197" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_seq_fav_9" value="4. Updated favorites" style="html=1;verticalAlign=bottom;dashed=1;endArrow=open;endFill=0;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1029" y="243" as="sourcePoint" />
+            <mxPoint x="716" y="243" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_seq_fav_10" value="5. JSON 200 OK" style="html=1;verticalAlign=bottom;dashed=1;endArrow=open;endFill=0;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="716" y="289" as="sourcePoint" />
+            <mxPoint x="403" y="289" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_seq_fav_11" value="6. Update UI state" style="html=1;verticalAlign=bottom;dashed=1;endArrow=open;endFill=0;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="403" y="335" as="sourcePoint" />
+            <mxPoint x="90" y="335" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

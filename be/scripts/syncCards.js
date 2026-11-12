@@ -64,12 +64,17 @@ async function syncCardData(options = { downloadImages: false, imageLimit: 100 }
     });
 
     const cardsData = res.data.data;
-    console.log(`[Sync] Đã nhận ${cardsData.length} thẻ từ YGOPRODeck. Đang xử lý vào MongoDB...`);
+    const existingCards = await Card.find().select('id').lean();
+    const existingIds = new Set(existingCards.map(c => c.id));
+    console.log(`[Sync] Đã nhận ${cardsData.length} thẻ từ YGOPRODeck. Chỉ cập nhật giá cho ${existingIds.size} thẻ Meta hiện có trong DB...`);
 
     const bulkOps = [];
     const now = new Date();
 
     for (const card of cardsData) {
+      if (existingIds.size > 0 && !existingIds.has(card.id)) {
+        continue; // Bỏ qua thẻ không thuộc danh sách Meta hiện tại
+      }
       const priceObj = card.card_prices && card.card_prices[0] ? {
         cardmarket_price: parseFloat(card.card_prices[0].cardmarket_price) || 0,
         tcgplayer_price: parseFloat(card.card_prices[0].tcgplayer_price) || 0,
