@@ -207,30 +207,33 @@ export default function BanlistPage() {
         <div style={{ maxWidth: '1100px', margin: '0 auto 1.75rem' }}>
           {/* Hàng lọc nhanh theo Năm & Chế độ xem */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.85rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-secondary)', marginRight: '0.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+              <label
+                htmlFor="banlist-year-select"
+                style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-secondary)' }}
+              >
                 Năm cập nhật:
-              </span>
-              {['all', '2026', '2025', '2024', '2023', '2022'].map((yr) => (
-                <button
-                  key={yr}
-                  type="button"
-                  onClick={() => handleYearFilter(yr)}
-                  style={{
-                    padding: '0.35rem 0.75rem',
-                    borderRadius: '8px',
-                    border: '1px solid var(--border-color)',
-                    background: selectedYear === yr ? 'var(--primary)' : 'var(--bg-secondary)',
-                    color: selectedYear === yr ? '#fff' : 'var(--text-primary)',
-                    fontSize: '0.82rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    transition: 'all 0.15s'
-                  }}
-                >
-                  {yr === 'all' ? 'Tất cả (2022 - 2026)' : `Năm ${yr}`}
-                </button>
-              ))}
+              </label>
+              <select
+                id="banlist-year-select"
+                value={selectedYear}
+                onChange={(e) => handleYearFilter(e.target.value)}
+                className="filter-select"
+                style={{
+                  width: 'auto',
+                  minWidth: '185px',
+                  padding: '0.45rem 2rem 0.45rem 0.85rem',
+                  fontSize: '0.86rem',
+                  fontWeight: 700
+                }}
+              >
+                <option value="all">Tất cả (2022 - 2026)</option>
+                <option value="2026">Năm 2026</option>
+                <option value="2025">Năm 2025</option>
+                <option value="2024">Năm 2024</option>
+                <option value="2023">Năm 2023</option>
+                <option value="2022">Năm 2022</option>
+              </select>
             </div>
 
             {/* Chế độ xem khi chọn tháng: Chỉ lá mới dính đạn vs Toàn bộ Banlist */}

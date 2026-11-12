@@ -11,7 +11,6 @@ import {
   Clock,
   Layers,
   Languages,
-  Sparkles,
   RefreshCw
 } from 'lucide-react';
 
@@ -81,25 +80,6 @@ export default function CardDetailPage() {
     } catch (err) {
       console.error('Error translating card effect:', err);
       setTranslateError('Lỗi kết nối khi dịch hiệu ứng. Vui lòng thử lại sau!');
-    } finally {
-      setTranslating(false);
-    }
-  };
-
-  // Dịch lại bản mới (bỏ qua cache)
-  const handleForceRetranslate = async () => {
-    if (!card || translating) return;
-    setTranslating(true);
-    setTranslateError(null);
-    try {
-      const res = await translateCardEffect(card.id, true);
-      if (res.data?.success && res.data.desc_vi) {
-        setTranslatedDesc(res.data.desc_vi);
-        setIsVietnamese(true);
-      }
-    } catch (err) {
-      console.error('Error re-translating card effect:', err);
-      setTranslateError('Lỗi khi dịch lại hiệu ứng.');
     } finally {
       setTranslating(false);
     }
@@ -317,26 +297,6 @@ export default function CardDetailPage() {
                   </button>
                 </div>
               </div>
-
-              {/* Thanh thông báo bản dịch Tiếng Việt & Nút dịch lại */}
-              {isVietnamese && (
-                <div className="trans-notice-bar">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Sparkles size={14} color="#10b981" />
-                    <span>Bản dịch Tiếng Việt chuẩn thuật ngữ Yu-Gi-Oh (Official)</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleForceRetranslate}
-                    className="retranslate-btn"
-                    title="Dịch lại bản mới nhất từ máy chủ"
-                    disabled={translating}
-                  >
-                    <RefreshCw size={12} className={translating ? 'spin' : ''} />
-                    <span>{translating ? 'Đang dịch...' : 'Dịch lại'}</span>
-                  </button>
-                </div>
-              )}
 
               {translateError && (
                 <div className="trans-error-box" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
