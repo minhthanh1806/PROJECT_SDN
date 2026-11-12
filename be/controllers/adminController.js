@@ -71,7 +71,7 @@ exports.getAdminDecks = async (req, res) => {
     if (category) query.category = category;
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
-    const limitNum = Math.max(1, parseInt(limit, 10) || 15);
+    const limitNum = Math.max(1, Math.min(100, parseInt(limit, 10) || 15));
     const skip = (pageNum - 1) * limitNum;
 
     const [totalDecks, decks] = await Promise.all([
@@ -285,7 +285,7 @@ exports.getAdminCards = async (req, res) => {
     if (type) query.type = type;
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
-    const limitNum = Math.max(1, parseInt(limit, 10) || 20);
+    const limitNum = Math.max(1, Math.min(100, parseInt(limit, 10) || 20));
     const skip = (pageNum - 1) * limitNum;
 
     const [totalCards, cards] = await Promise.all([
@@ -558,7 +558,7 @@ exports.getAdminUsers = async (req, res) => {
     if (role) query.role = role;
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
-    const limitNum = Math.max(1, parseInt(limit, 10) || 20);
+    const limitNum = Math.max(1, Math.min(100, parseInt(limit, 10) || 20));
     const skip = (pageNum - 1) * limitNum;
 
     const [totalUsers, users] = await Promise.all([
@@ -635,9 +635,12 @@ exports.deleteUser = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
     }
 
-    // Không cho phép xóa chính tài khoản admin đang đăng nhập hoặc tài khoản admin duy nhất
-    if (user.username === 'admin') {
-      return res.status(400).json({ success: false, message: 'Không thể xóa tài khoản Quản trị viên gốc (admin)' });
+    // Không cho phép xóa tài khoản admin cuối cùng
+    if (user.role === 'admin') {
+      const adminCount = await User.countDocuments({ role: 'admin' });
+      if (adminCount <= 1) {
+        return res.status(400).json({ success: false, message: 'Không thể xóa tài khoản Admin duy nhất trong hệ thống' });
+      }
     }
 
     await User.findByIdAndDelete(id);

@@ -156,7 +156,7 @@ exports.toggleFavorite = async (req, res) => {
     const { userId } = req.params;
     const cardId = Number(req.body.cardId);
 
-    if (!cardId) {
+    if (!cardId || isNaN(cardId) || cardId <= 0) {
       return res.status(400).json({ success: false, message: 'Thiếu cardId hợp lệ' });
     }
 

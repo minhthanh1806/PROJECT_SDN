@@ -568,7 +568,8 @@ exports.serveCardImage = async (req, res) => {
       res.sendFile(localPath);
     });
 
-    writer.on('error', () => {
+    writer.on('error', (err) => {
+      console.error('[serveCardImage write error]', err);
       res.status(500).send('Error saving image');
     });
 

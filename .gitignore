@@ -8,7 +8,9 @@ dist/
 fe/dist/
 
 # Environment files
-# .env
+.env
+be/.env
+fe/.env
 
 # Cached images
 be/public/images/cards/*.jpg

@@ -12,7 +12,10 @@ API.interceptors.request.use((config) => {
       const parsed = JSON.parse(stored);
       if (parsed && parsed.id) {
         config.headers['x-user-id'] = parsed.id;
-        config.headers['x-admin-id'] = parsed.id;
+        // Chỉ gắn x-admin-id nếu user có quyền admin
+        if (parsed.role === 'admin') {
+          config.headers['x-admin-id'] = parsed.id;
+        }
       }
     }
   } catch (err) {

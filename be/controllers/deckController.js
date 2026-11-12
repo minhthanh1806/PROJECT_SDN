@@ -74,11 +74,18 @@ exports.getDecks = async (req, res) => {
     // Lọc deck có chứa một lá bài nhất định (Main, Extra, hoặc Side)
     if (card_id) {
       const cid = Number(card_id);
-      query.$or = [
+      const cardFilter = [
         { 'main_deck.card_id': cid },
         { 'extra_deck.card_id': cid },
         { 'side_deck.card_id': cid }
       ];
+      // Nếu đã có $or từ keyword search thì gộp lại bằng $and để không ghi đè
+      if (query.$or) {
+        query.$and = [{ $or: query.$or }, { $or: cardFilter }];
+        delete query.$or;
+      } else {
+        query.$or = cardFilter;
+      }
     }
 
     // Lọc theo khoảng giá ($)
