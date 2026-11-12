@@ -15,6 +15,7 @@ fe/.env
 # Cached images
 be/public/images/cards/*.jpg
 
-# Logs
+# Logs & Office temp files
 *.log
 npm-debug.log*
+~$*
