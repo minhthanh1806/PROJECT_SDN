@@ -10,11 +10,12 @@ API.interceptors.request.use((config) => {
     const stored = localStorage.getItem('user') || localStorage.getItem('ygo_user');
     if (stored) {
       const parsed = JSON.parse(stored);
-      if (parsed && parsed.id) {
-        config.headers['x-user-id'] = parsed.id;
+      const uid = parsed?.id || parsed?._id;
+      if (uid) {
+        config.headers['x-user-id'] = uid;
         // Chỉ gắn x-admin-id nếu user có quyền admin
         if (parsed.role === 'admin') {
-          config.headers['x-admin-id'] = parsed.id;
+          config.headers['x-admin-id'] = uid;
         }
       }
     }
