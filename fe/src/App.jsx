@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage';
 import BanlistPage from './pages/BanlistPage';
 import DecksPage from './pages/DecksPage';
 import DeckDetailPage from './pages/DeckDetailPage';
+import DeckBuilderPage from './pages/DeckBuilderPage';
 import AuthPage from './pages/AuthPage';
 import ProfilePage from './pages/ProfilePage';
 import CardDetailPage from './pages/CardDetailPage';
@@ -20,6 +21,7 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/card/:id" element={<CardDetailPage />} />
             <Route path="/decks" element={<DecksPage />} />
+            <Route path="/deck-builder" element={<DeckBuilderPage />} />
             <Route path="/deck/:id" element={<DeckDetailPage />} />
             <Route path="/banlist" element={<BanlistPage />} />
             <Route path="/login" element={<AuthPage mode="login" />} />

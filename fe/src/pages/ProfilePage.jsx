@@ -203,13 +203,29 @@ export default function ProfilePage() {
             </div>
 
             {/* Tiêu đề danh sách thẻ */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '2rem 0 1.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '2rem 0 1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Star size={20} fill="#fbbf24" color="#fbbf24" />
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>
                   Thẻ bài yêu thích / Bộ sưu tập cá nhân
                 </h3>
               </div>
+              <Link
+                to="/deck-builder"
+                className="btn-primary"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  textDecoration: 'none',
+                  padding: '0.45rem 0.95rem',
+                  borderRadius: '8px',
+                  fontSize: '0.85rem',
+                  fontWeight: 700
+                }}
+              >
+                <Layers size={16} /> Quản lý Deck của tôi
+              </Link>
             </div>
 
             {/* Danh sách thẻ yêu thích */}

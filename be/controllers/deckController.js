@@ -300,3 +300,201 @@ exports.getDeckMeta = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// 5. Lấy danh sách Decks của chính người dùng đang đăng nhập
+exports.getUserDecks = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const decks = await Deck.find({ user_id: userId })
+      .sort({ updatedAt: -1 })
+      .lean();
+
+    return res.json({
+      success: true,
+      data: decks
+    });
+  } catch (error) {
+    console.error('[getUserDecks error]', error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Helper tính toán thống kê stats của bộ bài
+function calculateDeckStats(main = [], extra = [], side = []) {
+  let monsterCount = 0;
+  let spellCount = 0;
+  let trapCount = 0;
+  let totalPrice = 0;
+
+  main.forEach((c) => {
+    const qty = c.quantity || 1;
+    const typeLower = (c.card_type || '').toLowerCase();
+    if (typeLower.includes('spell')) spellCount += qty;
+    else if (typeLower.includes('trap')) trapCount += qty;
+    else monsterCount += qty;
+    totalPrice += (c.price || 0) * qty;
+  });
+
+  extra.forEach((c) => {
+    totalPrice += (c.price || 0) * (c.quantity || 1);
+  });
+  side.forEach((c) => {
+    totalPrice += (c.price || 0) * (c.quantity || 1);
+  });
+
+  return {
+    main_count: main.reduce((s, c) => s + (c.quantity || 1), 0),
+    extra_count: extra.reduce((s, c) => s + (c.quantity || 1), 0),
+    side_count: side.reduce((s, c) => s + (c.quantity || 1), 0),
+    monster_count: monsterCount,
+    spell_count: spellCount,
+    trap_count: trapCount,
+    total_price: Number(totalPrice.toFixed(2))
+  };
+}
+
+// 6. Người dùng tạo mới bộ bài cá nhân (Deck Builder)
+exports.createUserDeck = async (req, res) => {
+  try {
+    const user = req.user;
+    const {
+      name,
+      description = '',
+      category = 'Community',
+      format = 'TCG',
+      archetype = '',
+      main_deck = [],
+      extra_deck = [],
+      side_deck = []
+    } = req.body;
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({ success: false, message: 'Vui lòng nhập tên bộ bài' });
+    }
+
+    const stats = calculateDeckStats(main_deck, extra_deck, side_deck);
+    const coverCard = main_deck[0] || extra_deck[0] || {};
+    const slug = name
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '') + '-' + Date.now().toString().slice(-4);
+
+    const newDeck = new Deck({
+      name: name.trim(),
+      slug,
+      description,
+      user_id: user._id,
+      author: user.username || 'User',
+      category: ['Tournament Meta', 'Top Archetype', 'Budget Deck', 'Master Duel', 'Anime Deck', 'Community'].includes(category)
+        ? category
+        : 'Community',
+      format: ['TCG', 'OCG', 'Master Duel', 'GOAT', 'Edison'].includes(format) ? format : 'TCG',
+      archetype: (archetype || '').trim(),
+      cover_card_id: coverCard.card_id || null,
+      cover_card_name: coverCard.name || '',
+      cover_image_url: coverCard.image_url || '',
+      main_deck,
+      extra_deck,
+      side_deck,
+      stats,
+      is_featured: false
+    });
+
+    await newDeck.save();
+
+    return res.status(201).json({
+      success: true,
+      message: 'Tạo bộ bài mới thành công',
+      data: newDeck
+    });
+  } catch (error) {
+    console.error('[createUserDeck error]', error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// 7. Người dùng cập nhật bộ bài của chính mình
+exports.updateUserDeck = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    const deck = await Deck.findById(id);
+    if (!deck) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy bộ bài' });
+    }
+
+    // Kiểm tra quyền sở hữu bộ bài (chỉ chủ sở hữu deck hoặc admin mới được sửa)
+    if (String(deck.user_id) !== String(userId) && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Bạn không có quyền chỉnh sửa bộ bài này' });
+    }
+
+    const {
+      name,
+      description,
+      category,
+      format,
+      archetype,
+      main_deck,
+      extra_deck,
+      side_deck
+    } = req.body;
+
+    if (name) deck.name = name.trim();
+    if (description !== undefined) deck.description = description;
+    if (category) deck.category = category;
+    if (format) deck.format = format;
+    if (archetype !== undefined) deck.archetype = archetype.trim();
+
+    if (main_deck) deck.main_deck = main_deck;
+    if (extra_deck) deck.extra_deck = extra_deck;
+    if (side_deck) deck.side_deck = side_deck;
+
+    deck.stats = calculateDeckStats(deck.main_deck, deck.extra_deck, deck.side_deck);
+
+    const coverCard = deck.main_deck[0] || deck.extra_deck[0] || {};
+    deck.cover_card_id = coverCard.card_id || null;
+    deck.cover_card_name = coverCard.name || '';
+    deck.cover_image_url = coverCard.image_url || '';
+
+    await deck.save();
+
+    return res.json({
+      success: true,
+      message: 'Cập nhật bộ bài thành công',
+      data: deck
+    });
+  } catch (error) {
+    console.error('[updateUserDeck error]', error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// 8. Người dùng xóa bộ bài của chính mình
+exports.deleteUserDeck = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    const deck = await Deck.findById(id);
+    if (!deck) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy bộ bài' });
+    }
+
+    // Kiểm tra quyền sở hữu
+    if (String(deck.user_id) !== String(userId) && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Bạn không có quyền xóa bộ bài này' });
+    }
+
+    await Deck.findByIdAndDelete(id);
+
+    return res.json({
+      success: true,
+      message: 'Đã xóa bộ bài thành công'
+    });
+  } catch (error) {
+    console.error('[deleteUserDeck error]', error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};

@@ -1,5 +1,26 @@
 const User = require('../models/User');
 
+// Middleware xác thực người dùng đã đăng nhập (bất kể role là user hay admin)
+exports.requireAuth = async (req, res, next) => {
+  try {
+    const userId = req.headers['x-user-id'] || req.headers['x-admin-id'] || req.query.userId;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Yêu cầu đăng nhập tài khoản để thực hiện tính năng này' });
+    }
+
+    const user = await User.findById(userId).lean();
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'Tài khoản không tồn tại hoặc đã bị xóa' });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    console.error('[requireAuth error]', error);
+    return res.status(500).json({ success: false, message: 'Lỗi xác thực người dùng' });
+  }
+};
+
 // Middleware kiểm tra quyền Quản trị viên (Admin)
 exports.requireAdmin = async (req, res, next) => {
   try {

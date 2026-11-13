@@ -18,10 +18,11 @@ const deckSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     slug: { type: String, trim: true, index: true },
     description: { type: String, default: '' },
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true }, // Người tạo deck (nếu là user)
     category: {
       type: String,
       enum: ['Tournament Meta', 'Top Archetype', 'Budget Deck', 'Master Duel', 'Anime Deck', 'Community'],
-      default: 'Tournament Meta',
+      default: 'Community',
       index: true
     },
     format: {

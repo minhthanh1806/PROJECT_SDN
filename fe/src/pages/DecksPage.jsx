@@ -13,7 +13,8 @@ import {
   Eye,
   Heart,
   RotateCcw,
-  Sparkles
+  Sparkles,
+  PlusCircle
 } from 'lucide-react';
 
 export default function DecksPage() {
@@ -191,6 +192,23 @@ export default function DecksPage() {
                 <Filter size={16} />
                 <span>Bộ lọc nâng cao</span>
               </button>
+
+              <Link
+                to="/deck-builder"
+                className="btn-primary"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  textDecoration: 'none',
+                  padding: '0.65rem 1.15rem',
+                  borderRadius: '10px',
+                  fontWeight: 700,
+                  fontSize: '0.88rem'
+                }}
+              >
+                <PlusCircle size={17} /> Tạo Deck Mới
+              </Link>
             </div>
           </div>
         </div>

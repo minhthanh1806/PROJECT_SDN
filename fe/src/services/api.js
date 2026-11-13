@@ -41,14 +41,13 @@ export const getDecks = (params) => API.get('/decks', { params });
 export const getDeckById = (id) => API.get(`/decks/${id}`);
 export const getDeckMeta = () => API.get('/decks/meta');
 export const likeDeck = (id) => API.post(`/decks/${id}/like`);
+export const getMyDecks = () => API.get('/decks/my-decks');
+export const createUserDeck = (data) => API.post('/decks', data);
+export const updateUserDeck = (id, data) => API.put(`/decks/${id}`, data);
+export const deleteUserDeck = (id) => API.delete(`/decks/${id}`);
 
-// Admin APIs
+// Admin APIs (Admin chỉ quản lý Thống kê, Thẻ bài & Giá, Người dùng)
 export const getAdminStats = () => API.get('/admin/stats');
-export const getAdminDecks = (params) => API.get('/admin/decks', { params });
-export const createAdminDeck = (data) => API.post('/admin/decks', data);
-export const updateAdminDeck = (id, data) => API.put(`/admin/decks/${id}`, data);
-export const deleteAdminDeck = (id) => API.delete(`/admin/decks/${id}`);
-
 export const getAdminCards = (params) => API.get('/admin/cards', { params });
 export const createAdminCard = (data) => API.post('/admin/cards', data);
 export const updateAdminCard = (id, data) => API.put(`/admin/cards/${id}`, data);

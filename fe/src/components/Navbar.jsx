@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ShieldAlert, Home, LogIn, LogOut, User, Star, ChevronDown, Layers, ArrowRight, Search, Trophy, ShieldCheck } from 'lucide-react';
+import { ShieldAlert, Home, LogIn, LogOut, User, Star, ChevronDown, Layers, ArrowRight, Search, Trophy, ShieldCheck, PlusCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
@@ -136,6 +136,25 @@ export default function Navbar() {
                       <ArrowRight size={14} className="arrow-icon" />
                     </div>
                     <div className="item-desc">Browse the tier list and decks</div>
+                  </div>
+                </Link>
+
+                {/* 4. Deck Builder / Tạo Deck Mới */}
+                <Link
+                  to="/deck-builder"
+                  className="dropdown-item-block"
+                  style={{ borderTop: '1px solid var(--border-color)', marginTop: '4px', paddingTop: '8px' }}
+                  onClick={() => setDecksDropdownOpen(false)}
+                >
+                  <div className="dropdown-item-icon" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6' }}>
+                    <PlusCircle size={18} />
+                  </div>
+                  <div className="dropdown-item-text">
+                    <div className="item-title text-blue" style={{ color: '#3b82f6' }}>
+                      <span>Deck Builder (Tạo Deck)</span>
+                      <ArrowRight size={14} className="arrow-icon" />
+                    </div>
+                    <div className="item-desc">Xây dựng &amp; quản lý bộ bài cá nhân</div>
                   </div>
                 </Link>
               </div>
