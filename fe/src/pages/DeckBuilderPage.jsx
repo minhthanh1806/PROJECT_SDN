@@ -17,15 +17,41 @@ import {
   Trash2,
   Save,
   Download,
-  ArrowLeft,
   Sparkles,
   Zap,
   CheckCircle,
   AlertCircle,
   DollarSign,
   Shield,
-  RotateCcw
+  Eye,
+  Edit3,
+  Wand2,
+  X
 } from 'lucide-react';
+
+// Style chuẩn đồng bộ cho tất cả Input / Select / Textarea trên trang Deck Builder
+const FIELD_LABEL_STYLE = {
+  display: 'block',
+  fontSize: '0.82rem',
+  fontWeight: 700,
+  color: 'var(--text-secondary)',
+  marginBottom: '0.4rem',
+  letterSpacing: '0.01em'
+};
+
+const FIELD_INPUT_STYLE = {
+  width: '100%',
+  height: '42px',
+  padding: '0 0.85rem',
+  borderRadius: '10px',
+  border: '1px solid var(--border-color)',
+  backgroundColor: 'var(--bg-primary)',
+  color: 'var(--text-primary)',
+  fontSize: '0.9rem',
+  fontWeight: 500,
+  outline: 'none',
+  transition: 'border-color 0.15s ease, box-shadow 0.15s ease'
+};
 
 export default function DeckBuilderPage() {
   const { user } = useAuth();
@@ -47,8 +73,9 @@ export default function DeckBuilderPage() {
   const [sideDeck, setSideDeck] = useState([]);
   const [activeSection, setActiveSection] = useState('main'); // 'main', 'extra', 'side'
 
-  // Tìm kiếm thẻ bài
+  // Tìm kiếm thẻ bài & bộ lọc loại thẻ
   const [searchQuery, setSearchQuery] = useState('');
+  const [cardTypeFilter, setCardTypeFilter] = useState('all'); // 'all', 'Monster', 'Spell Card', 'Trap Card'
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
 
@@ -70,7 +97,7 @@ export default function DeckBuilderPage() {
     if (!user) {
       navigate('/login?redirect=/deck-builder');
     }
-  }, [user]);
+  }, [user, navigate]);
 
   // Load danh sách deck của tôi
   const loadMyDecks = () => {
@@ -112,15 +139,19 @@ export default function DeckBuilderPage() {
     }
   }, [editDeckId]);
 
-  // Tìm kiếm thẻ bài khi người dùng gõ
+  // Tìm kiếm thẻ bài (hoặc tải danh sách thẻ gợi ý ban đầu khi chưa gõ từ khóa)
   useEffect(() => {
-    if (!searchQuery.trim() || searchQuery.trim().length < 2) {
-      setSearchResults([]);
-      return;
-    }
     const timer = setTimeout(() => {
       setSearching(true);
-      getCards({ fname: searchQuery.trim(), limit: 12 })
+      const params = { limit: 14 };
+      if (searchQuery.trim()) {
+        params.fname = searchQuery.trim();
+      }
+      if (cardTypeFilter !== 'all') {
+        params.type = cardTypeFilter;
+      }
+
+      getCards(params)
         .then((res) => {
           if (res.data?.success && Array.isArray(res.data.data)) {
             setSearchResults(res.data.data);
@@ -128,20 +159,42 @@ export default function DeckBuilderPage() {
         })
         .catch((err) => console.error('Search card error:', err))
         .finally(() => setSearching(false));
-    }, 250);
+    }, 220);
 
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [searchQuery, cardTypeFilter]);
 
   // Thống kê số lượng thẻ & giá
   const mainCount = mainDeck.reduce((s, c) => s + (c.quantity || 1), 0);
   const extraCount = extraDeck.reduce((s, c) => s + (c.quantity || 1), 0);
   const sideCount = sideDeck.reduce((s, c) => s + (c.quantity || 1), 0);
-  const totalPrice = [
-    ...mainDeck,
-    ...extraDeck,
-    ...sideDeck
-  ].reduce((s, c) => s + (c.price || 0) * (c.quantity || 1), 0);
+  const totalPrice = [...mainDeck, ...extraDeck, ...sideDeck].reduce(
+    (s, c) => s + (c.price || 0) * (c.quantity || 1),
+    0
+  );
+
+  // Tự động nạp thẻ theo Archetype đã nhập
+  const handleAutoFillArchetype = async () => {
+    const arc = archetype.trim() || searchQuery.trim();
+    if (!arc) {
+      showToast('error', 'Hãy nhập tên Hệ bài (Archetype) trước khi nạp tự động!');
+      return;
+    }
+    setSearching(true);
+    try {
+      const res = await getCards({ fname: arc, limit: 25 });
+      if (res.data?.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
+        setSearchResults(res.data.data);
+        showToast('success', `Đã tìm thấy ${res.data.data.length} lá bài thuộc nhánh "${arc}"!`);
+      } else {
+        showToast('error', `Không tìm thấy lá bài nào cho "${arc}"`);
+      }
+    } catch (err) {
+      showToast('error', 'Không thể tìm kiếm theo Archetype');
+    } finally {
+      setSearching(false);
+    }
+  };
 
   // Thêm thẻ bài vào section (Main, Extra, Side)
   const handleAddCard = (card, targetSection = activeSection) => {
@@ -150,7 +203,6 @@ export default function DeckBuilderPage() {
       return t.includes('fusion') || t.includes('synchro') || t.includes('xyz') || t.includes('link');
     })();
 
-    // Tự động chuyển Extra deck nếu thẻ là Fusion/Synchro/Xyz/Link và đang ở Main
     let finalSection = targetSection;
     if (finalSection === 'main' && isExtraCard) {
       finalSection = 'extra';
@@ -178,18 +230,17 @@ export default function DeckBuilderPage() {
 
     const currentCount = list.reduce((s, c) => s + (c.quantity || 1), 0);
     if (currentCount >= maxSectionCount) {
-      showToast('error', `Phần ${finalSection.toUpperCase()} đã đạt giới hạn tối đa (${maxSectionCount} lá)!`);
+      showToast('error', `Phần ${finalSection.toUpperCase()} đã đạt tối đa (${maxSectionCount} lá)!`);
       return;
     }
 
-    // Đếm tổng số lượng bản sao của lá bài này trong cả Main + Extra + Side (Tối đa 3)
     const copiesInMain = mainDeck.find((c) => String(c.card_id) === String(card.id))?.quantity || 0;
     const copiesInExtra = extraDeck.find((c) => String(c.card_id) === String(card.id))?.quantity || 0;
     const copiesInSide = sideDeck.find((c) => String(c.card_id) === String(card.id))?.quantity || 0;
     const totalCopies = copiesInMain + copiesInExtra + copiesInSide;
 
     if (totalCopies >= 3) {
-      showToast('error', `Mỗi lá bài chỉ được tối đa 3 bản sao trong cả bộ bài!`);
+      showToast('error', 'Mỗi lá bài chỉ được tối đa 3 bản sao trong toàn bộ Deck!');
       return;
     }
 
@@ -209,15 +260,22 @@ export default function DeckBuilderPage() {
     }
 
     setList(list);
-    showToast('success', `Đã thêm ${card.name} vào ${finalSection.toUpperCase()} Deck!`);
+    showToast('success', `Đã thêm "${card.name}" vào ${finalSection.toUpperCase()} Deck`);
   };
 
   // Tăng/giảm số lượng thẻ
   const handleUpdateQty = (section, cardId, delta) => {
     let list, setList;
-    if (section === 'main') { list = [...mainDeck]; setList = setMainDeck; }
-    else if (section === 'extra') { list = [...extraDeck]; setList = setExtraDeck; }
-    else { list = [...sideDeck]; setList = setSideDeck; }
+    if (section === 'main') {
+      list = [...mainDeck];
+      setList = setMainDeck;
+    } else if (section === 'extra') {
+      list = [...extraDeck];
+      setList = setExtraDeck;
+    } else {
+      list = [...sideDeck];
+      setList = setSideDeck;
+    }
 
     const idx = list.findIndex((c) => String(c.card_id) === String(cardId));
     if (idx >= 0) {
@@ -225,10 +283,12 @@ export default function DeckBuilderPage() {
       if (newQty <= 0) {
         list.splice(idx, 1);
       } else {
-        // Kiểm tra tổng không quá 3 bản sao
-        const copiesInMain = section === 'main' ? 0 : (mainDeck.find((c) => String(c.card_id) === String(cardId))?.quantity || 0);
-        const copiesInExtra = section === 'extra' ? 0 : (extraDeck.find((c) => String(c.card_id) === String(cardId))?.quantity || 0);
-        const copiesInSide = section === 'side' ? 0 : (sideDeck.find((c) => String(c.card_id) === String(cardId))?.quantity || 0);
+        const copiesInMain =
+          section === 'main' ? 0 : mainDeck.find((c) => String(c.card_id) === String(cardId))?.quantity || 0;
+        const copiesInExtra =
+          section === 'extra' ? 0 : extraDeck.find((c) => String(c.card_id) === String(cardId))?.quantity || 0;
+        const copiesInSide =
+          section === 'side' ? 0 : sideDeck.find((c) => String(c.card_id) === String(cardId))?.quantity || 0;
         if (copiesInMain + copiesInExtra + copiesInSide + newQty > 3) {
           showToast('error', 'Tối đa 3 bản sao mỗi lá bài!');
           return;
@@ -246,7 +306,7 @@ export default function DeckBuilderPage() {
     else setSideDeck(sideDeck.filter((c) => String(c.card_id) !== String(cardId)));
   };
 
-  // Reset form deck
+  // Xóa trắng bộ bài đang soạn
   const handleNewDeck = () => {
     setDeckId(null);
     setName('');
@@ -262,13 +322,13 @@ export default function DeckBuilderPage() {
 
   // Lưu Deck (Tạo mới hoặc Cập nhật)
   const handleSaveDeck = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!name.trim()) {
-      showToast('error', 'Vui lòng nhập tên bộ bài!');
+      showToast('error', 'Vui lòng nhập Tên Bộ Bài trước khi lưu!');
       return;
     }
     if (mainCount < 40) {
-      showToast('error', `Main Deck cần tối thiểu 40 lá (hiện tại: ${mainCount} lá)!`);
+      showToast('error', `Main Deck cần tối thiểu 40 lá bài (hiện tại mới có ${mainCount} lá)!`);
       return;
     }
 
@@ -294,7 +354,7 @@ export default function DeckBuilderPage() {
       } else {
         const res = await createUserDeck(payload);
         if (res.data?.success) {
-          showToast('success', `Đã tạo bộ bài mới "${name}" thành công!`);
+          showToast('success', `Đã lưu bộ bài "${name}" thành công!`);
           setDeckId(res.data.data._id);
           loadMyDecks();
         }
@@ -306,7 +366,7 @@ export default function DeckBuilderPage() {
     }
   };
 
-  // Xóa Deck
+  // Xóa Deck cá nhân
   const handleDeleteDeck = async (id, deckName) => {
     if (!window.confirm(`Bạn có chắc chắn muốn xóa bộ bài "${deckName}"?`)) return;
     try {
@@ -345,14 +405,16 @@ export default function DeckBuilderPage() {
     link.download = `${(name || 'My_Deck').replace(/[^a-zA-Z0-9_-]/g, '_')}.ydk`;
     link.click();
     URL.revokeObjectURL(url);
-    showToast('success', 'Đã xuất file .ydk thành công!');
+    showToast('success', 'Đã xuất file .YDK thành công!');
   };
+
+  const currentList = activeSection === 'main' ? mainDeck : activeSection === 'extra' ? extraDeck : sideDeck;
 
   return (
     <div className="app-shell">
       <Navbar />
 
-      {/* Thông báo Toast */}
+      {/* Thông báo Toast nổi */}
       {toast && (
         <div
           style={{
@@ -362,14 +424,14 @@ export default function DeckBuilderPage() {
             zIndex: 9999,
             backgroundColor: toast.type === 'success' ? '#10b981' : '#ef4444',
             color: '#fff',
-            padding: '0.75rem 1.25rem',
-            borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+            padding: '0.8rem 1.25rem',
+            borderRadius: '10px',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.25)',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.5rem',
+            gap: '0.55rem',
             fontSize: '0.9rem',
-            fontWeight: 600
+            fontWeight: 700
           }}
         >
           {toast.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
@@ -377,144 +439,306 @@ export default function DeckBuilderPage() {
         </div>
       )}
 
-      <main className="container" style={{ padding: '2rem 1.25rem 4rem' }}>
-        {/* HEADER HERO */}
-        <div style={{ maxWidth: '1200px', margin: '0 auto 1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-                <span className="decks-badge-pill" style={{ margin: 0 }}>
-                  <Sparkles size={14} color="#f59e0b" /> Trình Tạo Bộ Bài Cá Nhân
-                </span>
-                {deckId && (
-                  <span style={{ fontSize: '0.8rem', background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', padding: '0.2rem 0.6rem', borderRadius: '6px', fontWeight: 700 }}>
-                    Chế độ: Đang Chỉnh Sửa
-                  </span>
-                )}
-              </div>
-              <h1 style={{ fontSize: '1.85rem', fontWeight: 800, margin: '0 0 0.35rem' }}>
-                {deckId ? `Chỉnh Sửa: ${name || 'Bộ bài'}` : 'Yu-Gi-Oh! Deck Builder'}
-              </h1>
-              <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '0.92rem' }}>
-                Tìm kiếm thẻ bài, tùy biến số lượng và xây dựng chiến thuật theo chuẩn Yu-Gi-Oh! (Main 40-60, Extra ≤ 15, Side ≤ 15).
-              </p>
-            </div>
-
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              <button
-                type="button"
-                onClick={handleNewDeck}
-                className="btn-secondary"
-                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.88rem' }}
-              >
-                <Plus size={16} /> Tạo Deck Mới
-              </button>
-              <button
-                type="button"
-                onClick={handleExportYDK}
-                disabled={mainCount === 0}
-                className="btn-secondary"
-                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.88rem' }}
-                title="Tải về file định dạng .ydk cho Project Ignis / EDOPro / YGOPRO"
-              >
-                <Download size={16} /> Xuất .YDK
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveDeck}
-                disabled={saving}
-                className="btn-primary"
-                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.88rem' }}
-              >
-                <Save size={16} /> {saving ? 'Đang lưu...' : deckId ? 'Lưu Thay Đổi' : 'Lưu Bộ Bài'}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* THÔNG TIN TỔNG QUAN VÀ METRIC BANNER */}
-        <div style={{ maxWidth: '1200px', margin: '0 auto 1.5rem' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Layers size={22} />
-              </div>
-              <div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Main Deck (40-60)</div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: mainCount >= 40 && mainCount <= 60 ? '#10b981' : '#ef4444' }}>
-                  {mainCount} / 60 lá {mainCount < 40 && <span style={{ fontSize: '0.75rem', fontWeight: 500 }}>(Cần thêm {40 - mainCount})</span>}
-                </div>
-              </div>
-            </div>
-
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Zap size={22} />
-              </div>
-              <div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Extra Deck (≤ 15)</div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: extraCount <= 15 ? '#10b981' : '#ef4444' }}>
-                  {extraCount} / 15 lá
-                </div>
-              </div>
-            </div>
-
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'rgba(100, 116, 139, 0.15)', color: '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Shield size={22} />
-              </div>
-              <div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Side Deck (≤ 15)</div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: sideCount <= 15 ? '#10b981' : '#ef4444' }}>
-                  {sideCount} / 15 lá
-                </div>
-              </div>
-            </div>
-
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <DollarSign size={22} />
-              </div>
-              <div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Ước Tính Giá Thị Trường</div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#10b981' }}>
-                  ${totalPrice.toFixed(2)}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* BỐ CỤC CHÍNH 2 CỘT: TRÁI LÀ TÌM KIẾM & BỘ SƯU TẬP, PHẢI LÀ BUILDER */}
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 340px', gap: '1.5rem' }}>
-          
-          {/* CỘT CHÍNH: FORM VÀ DANH SÁCH LÁ BÀI TRONG DECK */}
+      <main className="container" style={{ padding: '1.75rem 1.25rem 4rem' }}>
+        {/* ============================================================
+            BANNER HEADER TRANG DECK BUILDER
+            ============================================================ */}
+        <div
+          style={{
+            maxWidth: '1240px',
+            margin: '0 auto 1.5rem',
+            background: 'linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '16px',
+            padding: '1.5rem 1.75rem',
+            boxShadow: 'var(--card-shadow)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '1.25rem'
+          }}
+        >
           <div>
-            {/* THÔNG TIN BỘ BÀI */}
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1.25rem', marginBottom: '1.5rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.45rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  padding: '0.28rem 0.75rem',
+                  borderRadius: '999px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  backgroundColor: 'rgba(245, 158, 11, 0.12)',
+                  color: '#d97706',
+                  border: '1px solid rgba(245, 158, 11, 0.3)'
+                }}
+              >
+                <Sparkles size={13} color="#f59e0b" /> Trình Tạo Bộ Bài Cá Nhân
+              </span>
+
+              {deckId && (
+                <span
+                  style={{
+                    fontSize: '0.78rem',
+                    background: 'rgba(59, 130, 246, 0.12)',
+                    color: '#2563eb',
+                    padding: '0.28rem 0.75rem',
+                    borderRadius: '999px',
+                    fontWeight: 700,
+                    border: '1px solid rgba(59, 130, 246, 0.25)'
+                  }}
+                >
+                  Đang chỉnh sửa Deck
+                </span>
+              )}
+            </div>
+
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '0 0 0.3rem', letterSpacing: '-0.02em' }}>
+              {deckId ? `Chỉnh Sửa: ${name || 'Bộ Bài Cá Nhân'}` : 'Yu-Gi-Oh! Deck Builder'}
+            </h1>
+            <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '0.92rem' }}>
+              Xây dựng chiến thuật cá nhân theo chuẩn thi đấu Konami: Main Deck (40–60 lá), Extra Deck (≤ 15 lá), Side Deck (≤ 15 lá).
+            </p>
+          </div>
+
+          {/* CỤM 3 NÚT HÀNH ĐỘNG ĐỒNG BỘ, BO GÓC HIỆN ĐẠI */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={handleNewDeck}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                padding: '0.62rem 1.1rem',
+                borderRadius: '10px',
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--bg-primary)',
+                color: 'var(--text-primary)',
+                fontSize: '0.88rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Plus size={16} /> Làm Mới Form
+            </button>
+
+            <button
+              type="button"
+              onClick={handleExportYDK}
+              disabled={mainCount === 0}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                padding: '0.62rem 1.1rem',
+                borderRadius: '10px',
+                border: '1px solid rgba(139, 92, 246, 0.35)',
+                backgroundColor: mainCount === 0 ? 'var(--bg-primary)' : 'rgba(139, 92, 246, 0.1)',
+                color: mainCount === 0 ? 'var(--text-secondary)' : '#7c3aed',
+                opacity: mainCount === 0 ? 0.55 : 1,
+                fontSize: '0.88rem',
+                fontWeight: 700,
+                cursor: mainCount === 0 ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              title="Tải về file .ydk dùng cho EDOPro / YGOPRO / Master Duel"
+            >
+              <Download size={16} /> Xuất .YDK
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSaveDeck}
+              disabled={saving}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                padding: '0.62rem 1.3rem',
+                borderRadius: '10px',
+                border: 'none',
+                background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                color: '#ffffff',
+                fontSize: '0.9rem',
+                fontWeight: 700,
+                cursor: saving ? 'wait' : 'pointer',
+                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.28)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Save size={16} /> {saving ? 'Đang lưu...' : deckId ? 'Cập Nhật Deck' : 'Lưu Bộ Bài'}
+            </button>
+          </div>
+        </div>
+
+        {/* ============================================================
+            4 THẺ CHỈ SỐ TIẾN ĐỘ (KPI CARDS KÈM PROGRESS BAR)
+            ============================================================ */}
+        <div style={{ maxWidth: '1240px', margin: '0 auto 1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+            {/* Main Deck KPI */}
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '14px', padding: '1rem 1.15rem', boxShadow: 'var(--card-shadow)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)' }}>Main Deck (40–60)</span>
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(59, 130, 246, 0.12)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Layers size={18} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginBottom: '0.5rem' }}>
+                <span style={{ fontSize: '1.35rem', fontWeight: 800, color: mainCount >= 40 && mainCount <= 60 ? '#10b981' : '#3b82f6' }}>
+                  {mainCount} / 60 lá
+                </span>
+                <span style={{ fontSize: '0.76rem', fontWeight: 600, color: mainCount >= 40 ? '#10b981' : '#f59e0b' }}>
+                  {mainCount >= 40 ? '✓ Đạt chuẩn' : `(Cần thêm ${40 - mainCount} lá)`}
+                </span>
+              </div>
+              <div style={{ width: '100%', height: '6px', background: 'var(--bg-primary)', borderRadius: '999px', overflow: 'hidden' }}>
+                <div
+                  style={{
+                    width: `${Math.min(100, (mainCount / 40) * 100)}%`,
+                    height: '100%',
+                    background: mainCount >= 40 ? '#10b981' : '#3b82f6',
+                    borderRadius: '999px',
+                    transition: 'width 0.25s ease'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Extra Deck KPI */}
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '14px', padding: '1rem 1.15rem', boxShadow: 'var(--card-shadow)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)' }}>Extra Deck (0–15)</span>
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(168, 85, 247, 0.12)', color: '#a855f7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Zap size={18} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginBottom: '0.5rem' }}>
+                <span style={{ fontSize: '1.35rem', fontWeight: 800, color: '#a855f7' }}>
+                  {extraCount} / 15 lá
+                </span>
+                <span style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>Fusion, Synchro, Xyz, Link</span>
+              </div>
+              <div style={{ width: '100%', height: '6px', background: 'var(--bg-primary)', borderRadius: '999px', overflow: 'hidden' }}>
+                <div
+                  style={{
+                    width: `${Math.min(100, (extraCount / 15) * 100)}%`,
+                    height: '100%',
+                    background: '#a855f7',
+                    borderRadius: '999px',
+                    transition: 'width 0.25s ease'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Side Deck KPI */}
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '14px', padding: '1rem 1.15rem', boxShadow: 'var(--card-shadow)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)' }}>Side Deck (0–15)</span>
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(100, 116, 139, 0.12)', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Shield size={18} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginBottom: '0.5rem' }}>
+                <span style={{ fontSize: '1.35rem', fontWeight: 800, color: '#64748b' }}>
+                  {sideCount} / 15 lá
+                </span>
+                <span style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>Bài dự bị chiến thuật</span>
+              </div>
+              <div style={{ width: '100%', height: '6px', background: 'var(--bg-primary)', borderRadius: '999px', overflow: 'hidden' }}>
+                <div
+                  style={{
+                    width: `${Math.min(100, (sideCount / 15) * 100)}%`,
+                    height: '100%',
+                    background: '#64748b',
+                    borderRadius: '999px',
+                    transition: 'width 0.25s ease'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Tổng giá trị KPI */}
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '14px', padding: '1rem 1.15rem', boxShadow: 'var(--card-shadow)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)' }}>Ước Tính Giá Thị Trường</span>
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.12)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <DollarSign size={18} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginBottom: '0.5rem' }}>
+                <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#10b981' }}>
+                  ${totalPrice.toFixed(2)}
+                </span>
+                <span style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>
+                  ({mainCount + extraCount + sideCount} lá bài)
+                </span>
+              </div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                Tính theo giá thấp nhất từ 5 chợ quốc tế
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ============================================================
+            BỐ CỤC CHÍNH 2 CỘT: TRÁI (BUILDER) - PHẢI (TÌM THẺ & MY DECKS)
+            ============================================================ */}
+        <div
+          style={{
+            maxWidth: '1240px',
+            margin: '0 auto',
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0, 1fr) 370px',
+            gap: '1.5rem',
+            alignItems: 'start'
+          }}
+        >
+          {/* CỘT TRÁI: THÔNG TIN BỘ BÀI + LƯỚI THẺ BÀI */}
+          <div>
+            {/* KHUNG THÔNG TIN BỘ BÀI (ĐỒNG BỘ INPUT & SELECT) */}
+            <div
+              style={{
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '16px',
+                padding: '1.35rem',
+                marginBottom: '1.5rem',
+                boxShadow: 'var(--card-shadow)'
+              }}
+            >
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gap: '1rem',
+                  marginBottom: '1rem'
+                }}
+              >
+                {/* Tên Bộ Bài */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.35rem' }}>
-                    Tên Bộ Bài *
-                  </label>
+                  <label style={FIELD_LABEL_STYLE}>Tên Bộ Bài *</label>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Ví dụ: My Favorite Cyber Dragon, Kashtira Control..."
-                    style={{ width: '100%', padding: '0.55rem 0.85rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+                    placeholder="VD: Mitsu Ryzeal, Blue-Eyes..."
+                    style={FIELD_INPUT_STYLE}
                   />
                 </div>
 
+                {/* Format Thi Đấu */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.35rem' }}>
-                    Format Thi Đấu
-                  </label>
+                  <label style={FIELD_LABEL_STYLE}>Format Thi Đấu</label>
                   <select
                     value={format}
                     onChange={(e) => setFormat(e.target.value)}
-                    className="filter-select"
-                    style={{ width: '100%', padding: '0.55rem 0.85rem' }}
+                    style={{ ...FIELD_INPUT_STYLE, cursor: 'pointer' }}
                   >
                     <option value="TCG">TCG (Bắc Mỹ / Châu Âu)</option>
                     <option value="OCG">OCG (Nhật Bản / Châu Á)</option>
@@ -524,230 +748,474 @@ export default function DeckBuilderPage() {
                   </select>
                 </div>
 
+                {/* Danh Mục (Category) */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.35rem' }}>
-                    Archetype (Hệ bài)
-                  </label>
+                  <label style={FIELD_LABEL_STYLE}>Danh Mục (Category)</label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    style={{ ...FIELD_INPUT_STYLE, cursor: 'pointer' }}
+                  >
+                    <option value="Community">Community Deck</option>
+                    <option value="Tournament Meta">Tournament Meta</option>
+                    <option value="Top Archetype">Top Archetype</option>
+                    <option value="Budget Deck">Budget Deck (Giá rẻ)</option>
+                    <option value="Master Duel">Master Duel</option>
+                    <option value="Anime Deck">Anime Deck</option>
+                  </select>
+                </div>
+
+                {/* Archetype */}
+                <div>
+                  <label style={FIELD_LABEL_STYLE}>Archetype (Hệ bài)</label>
                   <input
                     type="text"
                     value={archetype}
                     onChange={(e) => setArchetype(e.target.value)}
-                    placeholder="Ví dụ: Blue-Eyes, Tearlaments, Snake-Eye..."
-                    style={{ width: '100%', padding: '0.55rem 0.85rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+                    placeholder="VD: Ryzeal, Snake-Eye..."
+                    style={FIELD_INPUT_STYLE}
                   />
                 </div>
               </div>
 
+              {/* Ghi Chú Chiến Thuật */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.35rem' }}>
-                  Ghi Chú / Mô Tả Chiến Thuật
-                </label>
+                <label style={FIELD_LABEL_STYLE}>Ghi Chú / Mô Tả Chiến Thuật</label>
                 <textarea
                   rows={2}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Ghi chú combo mở đầu, đối thủ khắc chế hoặc lưu ý khi cầm deck..."
-                  style={{ width: '100%', padding: '0.55rem 0.85rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', resize: 'vertical' }}
+                  placeholder="Ghi chú combo mở đầu, điểm mạnh/yếu hoặc cách side deck..."
+                  style={{
+                    ...FIELD_INPUT_STYLE,
+                    height: 'auto',
+                    padding: '0.65rem 0.85rem',
+                    resize: 'vertical'
+                  }}
                 />
               </div>
             </div>
 
-            {/* THANH TAB PHẦN BÀI: MAIN (40-60) | EXTRA (0-15) | SIDE (0-15) */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-              <div style={{ display: 'flex', gap: '0.5rem', background: 'var(--bg-secondary)', padding: '4px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-                <button
-                  type="button"
-                  onClick={() => setActiveSection('main')}
-                  style={{
-                    padding: '0.45rem 1rem',
-                    borderRadius: '8px',
-                    border: 'none',
-                    background: activeSection === 'main' ? '#3b82f6' : 'transparent',
-                    color: activeSection === 'main' ? '#fff' : 'var(--text-secondary)',
-                    fontWeight: 700,
-                    fontSize: '0.85rem',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Main Deck ({mainCount})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveSection('extra')}
-                  style={{
-                    padding: '0.45rem 1rem',
-                    borderRadius: '8px',
-                    border: 'none',
-                    background: activeSection === 'extra' ? '#a855f7' : 'transparent',
-                    color: activeSection === 'extra' ? '#fff' : 'var(--text-secondary)',
-                    fontWeight: 700,
-                    fontSize: '0.85rem',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Extra Deck ({extraCount})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveSection('side')}
-                  style={{
-                    padding: '0.45rem 1rem',
-                    borderRadius: '8px',
-                    border: 'none',
-                    background: activeSection === 'side' ? '#64748b' : 'transparent',
-                    color: activeSection === 'side' ? '#fff' : 'var(--text-secondary)',
-                    fontWeight: 700,
-                    fontSize: '0.85rem',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Side Deck ({sideCount})
-                </button>
+            {/* THANH TAB CHỌN PHẦN DECK: MAIN | EXTRA | SIDE */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '1rem',
+                flexWrap: 'wrap',
+                gap: '0.75rem'
+              }}
+            >
+              <div
+                style={{
+                  display: 'inline-flex',
+                  gap: '0.35rem',
+                  background: 'var(--bg-card)',
+                  padding: '5px',
+                  borderRadius: '12px',
+                  border: '1px solid var(--border-color)',
+                  boxShadow: 'var(--card-shadow)'
+                }}
+              >
+                {[
+                  { id: 'main', label: `Main Deck (${mainCount}/60)`, color: '#3b82f6' },
+                  { id: 'extra', label: `Extra Deck (${extraCount}/15)`, color: '#a855f7' },
+                  { id: 'side', label: `Side Deck (${sideCount}/15)`, color: '#64748b' }
+                ].map((tab) => {
+                  const isActive = activeSection === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setActiveSection(tab.id)}
+                      style={{
+                        padding: '0.5rem 1.05rem',
+                        borderRadius: '8px',
+                        border: 'none',
+                        background: isActive ? tab.color : 'transparent',
+                        color: isActive ? '#ffffff' : 'var(--text-secondary)',
+                        fontWeight: 700,
+                        fontSize: '0.86rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
               </div>
 
-              <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                {activeSection === 'main' && 'Yêu cầu 40 đến 60 lá bài Monster, Spell, Trap'}
-                {activeSection === 'extra' && 'Tối đa 15 lá Fusion, Synchro, Xyz, Link'}
-                {activeSection === 'side' && 'Tối đa 15 lá bài dự bị để xoay chuyển ván đấu'}
-              </div>
+              {currentList.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (activeSection === 'main') setMainDeck([]);
+                    else if (activeSection === 'extra') setExtraDeck([]);
+                    else setSideDeck([]);
+                  }}
+                  style={{
+                    border: 'none',
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    color: '#ef4444',
+                    padding: '0.4rem 0.8rem',
+                    borderRadius: '8px',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <Trash2 size={14} /> Xóa hết phần {activeSection.toUpperCase()}
+                </button>
+              )}
             </div>
 
-            {/* LƯỚI HIỂN THỊ CÁC THẺ TRONG PHẦN ĐANG CHỌN */}
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1.25rem', minHeight: '380px' }}>
-              {(() => {
-                const currentList = activeSection === 'main' ? mainDeck : activeSection === 'extra' ? extraDeck : sideDeck;
-                if (currentList.length === 0) {
-                  return (
-                    <div style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--text-secondary)' }}>
-                      <Layers size={40} style={{ opacity: 0.35, marginBottom: '0.75rem' }} />
-                      <div style={{ fontSize: '1rem', fontWeight: 600 }}>Chưa có thẻ nào trong {activeSection.toUpperCase()} Deck</div>
-                      <p style={{ fontSize: '0.85rem', maxWidth: '400px', margin: '0.4rem auto 0' }}>
-                        Dùng thanh tìm kiếm ở cột bên phải để thêm lá bài vào phần này nhé!
-                      </p>
-                    </div>
-                  );
-                }
-
-                return (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '0.75rem' }}>
-                    {currentList.map((card) => (
+            {/* KHUNG LƯỚI THẺ BÀI TRONG SECTION ĐANG CHỌN */}
+            <div
+              style={{
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '16px',
+                padding: '1.35rem',
+                minHeight: '420px',
+                boxShadow: 'var(--card-shadow)'
+              }}
+            >
+              {currentList.length === 0 ? (
+                <div
+                  style={{
+                    border: '2px dashed var(--border-color)',
+                    borderRadius: '14px',
+                    padding: '4.5rem 1.5rem',
+                    textAlign: 'center',
+                    color: 'var(--text-secondary)',
+                    background: 'var(--bg-primary)'
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '56px',
+                      height: '56px',
+                      borderRadius: '50%',
+                      background: 'rgba(59, 130, 246, 0.1)',
+                      color: '#3b82f6',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 1rem'
+                    }}
+                  >
+                    <Layers size={28} />
+                  </div>
+                  <div style={{ fontSize: '1.08rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
+                    Chưa có lá bài nào trong {activeSection.toUpperCase()} Deck
+                  </div>
+                  <p style={{ fontSize: '0.88rem', maxWidth: '420px', margin: '0 auto 1.25rem' }}>
+                    Hãy bấm nút <strong>&quot;+ Thêm&quot;</strong> ở danh sách thẻ bài cột bên phải để đưa lá bài vào bộ bài của bạn.
+                  </p>
+                </div>
+              ) : (
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(128px, 1fr))',
+                    gap: '0.85rem'
+                  }}
+                >
+                  {currentList.map((card) => (
+                    <div
+                      key={card.card_id}
+                      style={{
+                        background: 'var(--bg-primary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '10px',
+                        padding: '0.5rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        transition: 'transform 0.15s ease, box-shadow 0.15s ease'
+                      }}
+                    >
+                      {/* Ảnh thẻ bài + Badge số lượng */}
                       <div
-                        key={card.card_id}
                         style={{
-                          background: 'var(--bg-primary)',
-                          border: '1px solid var(--border-color)',
-                          borderRadius: '8px',
-                          padding: '0.5rem',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          position: 'relative'
+                          position: 'relative',
+                          width: '100%',
+                          aspectRatio: '421/614',
+                          borderRadius: '6px',
+                          overflow: 'hidden',
+                          marginBottom: '0.45rem',
+                          backgroundColor: '#0f172a'
                         }}
                       >
-                        <div style={{ position: 'relative', width: '100%', aspectRatio: '421/614', borderRadius: '6px', overflow: 'hidden', marginBottom: '0.4rem' }}>
-                          <img
-                            src={card.image_url_small || `/images/cards/${card.card_id}_small.jpg`}
-                            alt={card.name}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                            onError={(e) => { e.target.src = 'https://images.ygoprodeck.com/images/cards_small/back.jpg'; }}
-                          />
-                          <span
-                            style={{
-                              position: 'absolute',
-                              top: '4px',
-                              right: '4px',
-                              background: '#ef4444',
-                              color: '#fff',
-                              fontSize: '0.75rem',
-                              fontWeight: 800,
-                              width: '22px',
-                              height: '22px',
-                              borderRadius: '50%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              boxShadow: '0 2px 4px rgba(0,0,0,0.4)'
-                            }}
-                          >
-                            x{card.quantity || 1}
-                          </span>
-                        </div>
+                        <img
+                          src={card.image_url_small || `/images/cards/${card.card_id}_small.jpg`}
+                          alt={card.name}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          onError={(e) => {
+                            e.target.src = 'https://images.ygoprodeck.com/images/cards_small/back.jpg';
+                          }}
+                        />
+                        <span
+                          style={{
+                            position: 'absolute',
+                            top: '6px',
+                            right: '6px',
+                            background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                            color: '#fff',
+                            fontSize: '0.75rem',
+                            fontWeight: 800,
+                            padding: '2px 7px',
+                            borderRadius: '999px',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.45)'
+                          }}
+                        >
+                          x{card.quantity || 1}
+                        </span>
+                      </div>
 
-                        <div style={{ fontSize: '0.78rem', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.35rem' }} title={card.name}>
-                          {card.name}
-                        </div>
+                      {/* Tên thẻ & Giá */}
+                      <Link
+                        to={`/card/${card.card_id}`}
+                        style={{
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          marginBottom: '0.15rem',
+                          color: 'var(--text-primary)'
+                        }}
+                        title={card.name}
+                      >
+                        {card.name}
+                      </Link>
+                      <div style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: 700, marginBottom: '0.45rem' }}>
+                        ${Number(card.price || 0).toFixed(2)}
+                      </div>
 
-                        {/* NÚT TĂNG/GIẢM VÀ XÓA */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '0.25rem', borderTop: '1px solid var(--border-color)' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateQty(activeSection, card.card_id, -1)}
-                              style={{ width: '22px', height: '22px', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem' }}
-                            >
-                              -
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateQty(activeSection, card.card_id, 1)}
-                              style={{ width: '22px', height: '22px', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem' }}
-                            >
-                              +
-                            </button>
-                          </div>
-
+                      {/* Thanh điều khiển số lượng (- / + / Xóa) */}
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          marginTop: 'auto',
+                          paddingTop: '0.35rem',
+                          borderTop: '1px solid var(--border-color)'
+                        }}
+                      >
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                           <button
                             type="button"
-                            onClick={() => handleRemoveCard(activeSection, card.card_id)}
-                            style={{ border: 'none', background: 'none', color: '#ef4444', cursor: 'pointer', padding: '2px' }}
-                            title="Xóa khỏi Deck"
+                            onClick={() => handleUpdateQty(activeSection, card.card_id, -1)}
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              borderRadius: '6px',
+                              border: '1px solid var(--border-color)',
+                              background: 'var(--bg-card)',
+                              color: 'var(--text-primary)',
+                              cursor: 'pointer',
+                              fontWeight: 800,
+                              fontSize: '0.85rem',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                            title="Giảm 1 lá"
                           >
-                            <Trash2 size={14} />
+                            -
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateQty(activeSection, card.card_id, 1)}
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              borderRadius: '6px',
+                              border: '1px solid var(--border-color)',
+                              background: 'var(--bg-card)',
+                              color: 'var(--text-primary)',
+                              cursor: 'pointer',
+                              fontWeight: 800,
+                              fontSize: '0.85rem',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                            title="Thêm 1 bản sao (Tối đa 3)"
+                          >
+                            +
                           </button>
                         </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveCard(activeSection, card.card_id)}
+                          style={{
+                            width: '24px',
+                            height: '24px',
+                            borderRadius: '6px',
+                            border: 'none',
+                            background: 'rgba(239, 68, 68, 0.12)',
+                            color: '#ef4444',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          title="Xóa thẻ khỏi Deck"
+                        >
+                          <Trash2 size={13} />
+                        </button>
                       </div>
-                    ))}
-                  </div>
-                );
-              })()}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* CỘT PHỤ (BÊN PHẢI): TÌM KIẾM THẺ NHANH & DANH SÁCH DECKS CỦA TÔI */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            
-            {/* KHUNG TÌM KIẾM LÁ BÀI */}
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1.25rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.75rem', fontWeight: 700, fontSize: '0.95rem' }}>
-                <Search size={18} color="var(--primary)" />
-                <span>Tìm &amp; Thêm Thẻ Bài</span>
+          {/* ============================================================
+              CỘT PHẢI: TÌM & THÊM THẺ BÀI + DANH SÁCH DECK CỦA TÔI
+              ============================================================ */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: '80px' }}>
+            {/* KHUNG TÌM & THÊM THẺ BÀI */}
+            <div
+              style={{
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '16px',
+                padding: '1.25rem',
+                boxShadow: 'var(--card-shadow)'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontWeight: 800, fontSize: '0.98rem' }}>
+                  <Search size={18} color="#3b82f6" />
+                  <span>Tìm &amp; Thêm Thẻ Bài</span>
+                </div>
+
+                {archetype.trim() && (
+                  <button
+                    type="button"
+                    onClick={handleAutoFillArchetype}
+                    style={{
+                      border: '1px solid rgba(59, 130, 246, 0.3)',
+                      background: 'rgba(59, 130, 246, 0.1)',
+                      color: '#2563eb',
+                      borderRadius: '6px',
+                      padding: '0.22rem 0.55rem',
+                      fontSize: '0.74rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '3px'
+                    }}
+                  >
+                    <Wand2 size={12} /> Lọc {archetype.trim()}
+                  </button>
+                )}
               </div>
 
-              <div style={{ position: 'relative', marginBottom: '0.75rem' }}>
+              {/* Ô nhập từ khóa tìm kiếm */}
+              <div style={{ position: 'relative', marginBottom: '0.65rem' }}>
+                <Search
+                  size={16}
+                  style={{
+                    position: 'absolute',
+                    left: '0.8rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: 'var(--text-secondary)'
+                  }}
+                />
                 <input
                   type="text"
-                  placeholder="Gõ tên lá bài..."
+                  placeholder="Gõ tên lá bài (VD: Ash Blossom, Snake-Eye...)"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   style={{
-                    width: '100%',
-                    padding: '0.55rem 0.85rem',
-                    borderRadius: '8px',
-                    border: '1px solid var(--border-color)',
-                    background: 'var(--bg-primary)',
-                    color: 'var(--text-primary)',
-                    fontSize: '0.88rem'
+                    ...FIELD_INPUT_STYLE,
+                    paddingLeft: '2.3rem',
+                    paddingRight: searchQuery ? '2rem' : '0.85rem'
                   }}
                 />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    style={{
+                      position: 'absolute',
+                      right: '0.6rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      border: 'none',
+                      background: 'none',
+                      color: 'var(--text-secondary)',
+                      cursor: 'pointer',
+                      display: 'flex'
+                    }}
+                  >
+                    <X size={15} />
+                  </button>
+                )}
               </div>
 
-              <div style={{ maxHeight: '380px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {/* Chip lọc nhanh Monster / Spell / Trap */}
+              <div style={{ display: 'flex', gap: '0.35rem', marginBottom: '0.85rem', flexWrap: 'wrap' }}>
+                {[
+                  { id: 'all', label: 'Tất cả' },
+                  { id: 'Effect Monster', label: 'Monster' },
+                  { id: 'Spell Card', label: 'Spell' },
+                  { id: 'Trap Card', label: 'Trap' }
+                ].map((flt) => {
+                  const active = cardTypeFilter === flt.id;
+                  return (
+                    <button
+                      key={flt.id}
+                      type="button"
+                      onClick={() => setCardTypeFilter(flt.id)}
+                      style={{
+                        padding: '0.28rem 0.65rem',
+                        borderRadius: '999px',
+                        border: active ? '1px solid #3b82f6' : '1px solid var(--border-color)',
+                        background: active ? 'rgba(59, 130, 246, 0.14)' : 'var(--bg-primary)',
+                        color: active ? '#2563eb' : 'var(--text-secondary)',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {flt.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Danh sách kết quả thẻ bài */}
+              <div
+                style={{
+                  maxHeight: '390px',
+                  overflowY: 'auto',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.5rem',
+                  paddingRight: '2px'
+                }}
+              >
                 {searching ? (
-                  <div style={{ textAlign: 'center', padding: '1.5rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                  <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                     Đang tìm kiếm lá bài...
                   </div>
                 ) : searchResults.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '1.5rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                    {searchQuery.trim().length >= 2 ? 'Không tìm thấy lá bài nào khớp' : 'Nhập ít nhất 2 ký tự để tìm kiếm'}
+                  <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                    Không tìm thấy lá bài nào phù hợp.
                   </div>
                 ) : (
                   searchResults.map((c) => (
@@ -757,122 +1225,231 @@ export default function DeckBuilderPage() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        padding: '0.45rem 0.5rem',
-                        borderRadius: '8px',
+                        padding: '0.5rem 0.6rem',
+                        borderRadius: '10px',
                         background: 'var(--bg-primary)',
                         border: '1px solid var(--border-color)',
-                        gap: '0.5rem'
+                        gap: '0.6rem'
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', overflow: 'hidden' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', overflow: 'hidden' }}>
                         <img
                           src={c.card_images?.[0]?.image_url_small || `/images/cards/${c.id}_small.jpg`}
                           alt={c.name}
-                          style={{ width: '28px', height: '40px', objectFit: 'cover', borderRadius: '4px', flexShrink: 0 }}
-                          onError={(e) => { e.target.src = 'https://images.ygoprodeck.com/images/cards_small/back.jpg'; }}
+                          style={{
+                            width: '32px',
+                            height: '46px',
+                            objectFit: 'cover',
+                            borderRadius: '4px',
+                            flexShrink: 0
+                          }}
+                          onError={(e) => {
+                            e.target.src = 'https://images.ygoprodeck.com/images/cards_small/back.jpg';
+                          }}
                         />
                         <div style={{ overflow: 'hidden' }}>
-                          <div style={{ fontSize: '0.82rem', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={c.name}>
+                          <div
+                            style={{
+                              fontSize: '0.84rem',
+                              fontWeight: 700,
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis'
+                            }}
+                            title={c.name}
+                          >
                             {c.name}
                           </div>
-                          <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
-                            {c.min_price > 0 ? `$${c.min_price}` : '$1.00'} • {c.type}
+                          <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                            <strong style={{ color: '#10b981' }}>${Number(c.min_price || 0).toFixed(2)}</strong> • {c.type}
                           </div>
                         </div>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => handleAddCard(c)}
-                        style={{
-                          padding: '0.35rem 0.65rem',
-                          borderRadius: '6px',
-                          border: 'none',
-                          background: 'var(--primary)',
-                          color: '#fff',
-                          fontSize: '0.75rem',
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                          flexShrink: 0
-                        }}
-                      >
-                        + Thêm
-                      </button>
+                      <div style={{ display: 'flex', gap: '0.3rem', flexShrink: 0 }}>
+                        <button
+                          type="button"
+                          onClick={() => handleAddCard(c)}
+                          style={{
+                            padding: '0.38rem 0.7rem',
+                            borderRadius: '8px',
+                            border: 'none',
+                            background: '#3b82f6',
+                            color: '#fff',
+                            fontSize: '0.76rem',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                          title="Thêm vào phần Deck đang chọn"
+                        >
+                          + Thêm
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleAddCard(c, 'side')}
+                          style={{
+                            padding: '0.38rem 0.5rem',
+                            borderRadius: '8px',
+                            border: '1px solid var(--border-color)',
+                            background: 'var(--bg-card)',
+                            color: 'var(--text-secondary)',
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                          title="Thêm vào Side Deck"
+                        >
+                          +Side
+                        </button>
+                      </div>
                     </div>
                   ))
                 )}
               </div>
             </div>
 
-            {/* DANH SÁCH BỘ BÀI CỦA TÔI */}
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1.25rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontWeight: 700, fontSize: '0.95rem' }}>
+            {/* KHUNG DANH SÁCH DECK CỦA TÔI */}
+            <div
+              style={{
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '16px',
+                padding: '1.25rem',
+                boxShadow: 'var(--card-shadow)'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontWeight: 800, fontSize: '0.98rem' }}>
                   <Layers size={18} color="#10b981" />
                   <span>Deck Của Tôi ({myDecks.length})</span>
                 </div>
               </div>
 
               {loadingMyDecks ? (
-                <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                  Đang tải danh sách...
+                <div style={{ textAlign: 'center', padding: '1.25rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                  Đang tải danh sách bộ bài...
                 </div>
               ) : myDecks.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '1.5rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                  Bạn chưa có bộ bài nào. Hãy tạo ngay một deck đầu tiên nhé!
+                <div
+                  style={{
+                    textAlign: 'center',
+                    padding: '1.5rem 1rem',
+                    color: 'var(--text-secondary)',
+                    fontSize: '0.84rem',
+                    border: '1px dashed var(--border-color)',
+                    borderRadius: '10px',
+                    background: 'var(--bg-primary)'
+                  }}
+                >
+                  Bạn chưa lưu bộ bài nào. Hãy thêm đủ 40 lá Main Deck và bấm <strong>&quot;Lưu Bộ Bài&quot;</strong> nhé!
                 </div>
               ) : (
-                <div style={{ maxHeight: '300px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  {myDecks.map((d) => (
-                    <div
-                      key={d._id}
-                      style={{
-                        padding: '0.6rem 0.75rem',
-                        borderRadius: '8px',
-                        background: deckId === d._id ? 'rgba(59, 130, 246, 0.15)' : 'var(--bg-primary)',
-                        border: deckId === d._id ? '1px solid #3b82f6' : '1px solid var(--border-color)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
-                      }}
-                    >
+                <div style={{ maxHeight: '280px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
+                  {myDecks.map((d) => {
+                    const isCurrent = deckId === d._id;
+                    return (
                       <div
-                        onClick={() => navigate(`/deck-builder?id=${d._id}`)}
-                        style={{ cursor: 'pointer', overflow: 'hidden', flex: 1 }}
+                        key={d._id}
+                        style={{
+                          padding: '0.65rem 0.75rem',
+                          borderRadius: '10px',
+                          background: isCurrent ? 'rgba(59, 130, 246, 0.1)' : 'var(--bg-primary)',
+                          border: isCurrent ? '1px solid #3b82f6' : '1px solid var(--border-color)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '0.5rem'
+                        }}
                       >
-                        <div style={{ fontWeight: 700, fontSize: '0.86rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {d.name}
+                        <div
+                          onClick={() => navigate(`/deck-builder?id=${d._id}`)}
+                          style={{ cursor: 'pointer', overflow: 'hidden', flex: 1 }}
+                        >
+                          <div
+                            style={{
+                              fontWeight: 700,
+                              fontSize: '0.88rem',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              color: isCurrent ? '#2563eb' : 'var(--text-primary)'
+                            }}
+                          >
+                            {d.name}
+                          </div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                            <span style={{ fontWeight: 700, color: '#3b82f6' }}>{d.format}</span> •{' '}
+                            {d.stats?.main_count || 0}M / {d.stats?.extra_count || 0}E •{' '}
+                            <strong style={{ color: '#10b981' }}>${Number(d.stats?.total_price || 0).toFixed(2)}</strong>
+                          </div>
                         </div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                          {d.format} • {(d.stats?.main_count || 0)} lá • ${(d.stats?.total_price || 0).toFixed(2)}
-                        </div>
-                      </div>
 
-                      <div style={{ display: 'flex', gap: '0.25rem' }}>
-                        <Link
-                          to={`/deck/${d._id}`}
-                          style={{ color: 'var(--text-secondary)', padding: '0.2rem', textDecoration: 'none' }}
-                          title="Xem chi tiết"
-                        >
-                          👁️
-                        </Link>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteDeck(d._id, d.name)}
-                          style={{ border: 'none', background: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.2rem' }}
-                          title="Xóa deck"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
+                          <button
+                            type="button"
+                            onClick={() => navigate(`/deck-builder?id=${d._id}`)}
+                            style={{
+                              width: '28px',
+                              height: '28px',
+                              borderRadius: '6px',
+                              border: '1px solid var(--border-color)',
+                              background: 'var(--bg-card)',
+                              color: '#3b82f6',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                            title="Sửa bộ bài này"
+                          >
+                            <Edit3 size={14} />
+                          </button>
+
+                          <Link
+                            to={`/deck/${d._id}`}
+                            style={{
+                              width: '28px',
+                              height: '28px',
+                              borderRadius: '6px',
+                              border: '1px solid var(--border-color)',
+                              background: 'var(--bg-card)',
+                              color: 'var(--text-secondary)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                            title="Xem trang chi tiết Deck"
+                          >
+                            <Eye size={14} />
+                          </Link>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteDeck(d._id, d.name)}
+                            style={{
+                              width: '28px',
+                              height: '28px',
+                              borderRadius: '6px',
+                              border: 'none',
+                              background: 'rgba(239, 68, 68, 0.12)',
+                              color: '#ef4444',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                            title="Xóa bộ bài"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
-
           </div>
-
         </div>
       </main>
     </div>
