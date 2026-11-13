@@ -99,7 +99,7 @@
       </root>
     </mxGraphModel>
   </diagram>
-  <diagram id="diag_seq_admin_cards" name="3.4.2 Sequence - Admin Price Override">
+  <diagram id="diag_seq_admin_cards" name="3.4.2 Sequence - Admin Cards CRUD &amp; Price Override">
     <mxGraphModel dx="1420" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1120" pageHeight="408" math="0" shadow="0">
       <root>
         <mxCell id="0" />
@@ -158,7 +158,7 @@
       </root>
     </mxGraphModel>
   </diagram>
-  <diagram id="diag_seq_admin_users" name="3.4.3 Sequence - Admin Decks/Users CRUD">
+  <diagram id="diag_seq_admin_users" name="3.4.3 Sequence - Admin User Role &amp; Account Management">
     <mxGraphModel dx="1420" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1120" pageHeight="408" math="0" shadow="0">
       <root>
         <mxCell id="0" />
@@ -178,7 +178,7 @@
         <mxCell id="c_seq_admin_users_6" value="MongoDB" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=12;size=36;strokeWidth=1.2;" vertex="1" parent="1">
           <mxGeometry x="960" y="35" width="140" height="353" as="geometry" />
         </mxCell>
-        <mxCell id="c_seq_admin_users_7" value="1. Toggle role or save Deck" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+        <mxCell id="c_seq_admin_users_7" value="1. Toggle role or delete User" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="90" y="105" as="sourcePoint" />
             <mxPoint x="325" y="105" as="targetPoint" />
@@ -196,13 +196,13 @@
             <mxPoint x="795" y="197" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="c_seq_admin_users_10" value="4. Update collection" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+        <mxCell id="c_seq_admin_users_10" value="4. Update users collection" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="795" y="243" as="sourcePoint" />
             <mxPoint x="1030" y="243" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="c_seq_admin_users_11" value="5. Updated doc" style="html=1;verticalAlign=bottom;dashed=1;endArrow=open;endFill=0;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+        <mxCell id="c_seq_admin_users_11" value="5. Updated User doc" style="html=1;verticalAlign=bottom;dashed=1;endArrow=open;endFill=0;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1030" y="289" as="sourcePoint" />
             <mxPoint x="795" y="289" as="targetPoint" />

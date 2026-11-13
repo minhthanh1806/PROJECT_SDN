@@ -49,7 +49,7 @@
         <mxCell id="c_cls_card_16" value="" style="line;strokeWidth=1;fillColor=none;strokeColor=#000000;" vertex="1" parent="c_cls_card_14">
           <mxGeometry y="59" width="280" height="6" as="geometry" />
         </mxCell>
-        <mxCell id="c_cls_card_17" value="+ GET /api/cards&lt;br&gt;+ GET /api/cards/:id&lt;br&gt;+ POST /:id/translate" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_card_14">
+        <mxCell id="c_cls_card_17" value="+ GET /api/cards&lt;br&gt;+ GET /api/cards/:id&lt;br&gt;+ GET /:id/translate" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_cls_card_14">
           <mxGeometry y="65" width="280" height="67" as="geometry" />
         </mxCell>
         <mxCell id="c_cls_card_18" value="TranslationPipeline" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;strokeWidth=1.2;" vertex="1" parent="1">
@@ -191,13 +191,13 @@
         <mxCell id="c_seq_translate_6" value="Translator" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=12;size=36;strokeWidth=1.2;" vertex="1" parent="1">
           <mxGeometry x="960" y="35" width="140" height="401" as="geometry" />
         </mxCell>
-        <mxCell id="c_seq_translate_7" value="1. Click Translate button" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+        <mxCell id="c_seq_translate_7" value="1. Open CardDetailPage" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="90" y="105" as="sourcePoint" />
             <mxPoint x="325" y="105" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="c_seq_translate_8" value="2. POST /api/cards/:id/translate" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
+        <mxCell id="c_seq_translate_8" value="2. GET /api/cards/:id/translate" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;rounded=0;strokeColor=#000000;fontColor=#000000;fontSize=11.5;labelBackgroundColor=#ffffff;strokeWidth=1.1;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="325" y="151" as="sourcePoint" />
             <mxPoint x="560" y="151" as="targetPoint" />

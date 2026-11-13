@@ -63,7 +63,7 @@
         <mxCell id="c_ui_detail_8" value="Type | Attr | Race | Level | ATK / DEF" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_detail_7">
           <mxGeometry y="28" width="705" height="73" as="geometry" />
         </mxCell>
-        <mxCell id="c_ui_detail_9" value="Effect Box + [ Translate to Vietnamese ] (desc_vi)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_detail_7">
+        <mxCell id="c_ui_detail_9" value="Effect Box + [ EN / VI Toggle ] (desc_vi)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_detail_7">
           <mxGeometry y="101" width="705" height="73" as="geometry" />
         </mxCell>
         <mxCell id="c_ui_detail_10" value="5 Markets: Cardmarket | TCGplayer | eBay | Amazon | CSI" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_detail_7">
@@ -75,7 +75,7 @@
       </root>
     </mxGraphModel>
   </diagram>
-  <diagram id="diag_ui_decks" name="3.3 DecksPage &amp; DeckDetailPage Wireframe">
+  <diagram id="diag_ui_decks" name="3.3 DecksPage, DeckDetailPage &amp; DeckBuilderPage Wireframe">
     <mxGraphModel dx="1420" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="460" math="0" shadow="0">
       <root>
         <mxCell id="0" />
@@ -83,23 +83,23 @@
         <mxCell id="c_ui_decks_2" value="Navbar:   YGO CARD MARKET   |   Cards   |   Decks   |   Banlist   |   Profile   |   Admin" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=13;fontStyle=1;align=left;verticalAlign=middle;strokeWidth=1.2;" vertex="1" parent="1">
           <mxGeometry x="40" y="35" width="1020" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="c_ui_decks_3" value="DecksPage (/decks)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=13;strokeWidth=1.2;" vertex="1" parent="1">
-          <mxGeometry x="40" y="100" width="490" height="320" as="geometry" />
+        <mxCell id="c_ui_decks_3" value="DecksPage (/decks) &amp; DeckDetailPage (/deck/:id)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=13;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="100" width="500" height="320" as="geometry" />
         </mxCell>
-        <mxCell id="c_ui_decks_4" value="Filter: Category | Format | Price" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_decks_3">
-          <mxGeometry y="28" width="490" height="146" as="geometry" />
+        <mxCell id="c_ui_decks_4" value="Filter: Category | Format | Price | [+ Create Deck]" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_decks_3">
+          <mxGeometry y="28" width="500" height="146" as="geometry" />
         </mxCell>
-        <mxCell id="c_ui_decks_5" value="Deck Grid Cards (40+ Decks)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_decks_3">
-          <mxGeometry y="174" width="490" height="146" as="geometry" />
+        <mxCell id="c_ui_decks_5" value="Deck Grid &amp; Detail (Main / Extra / Side, Like, .ydk)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_decks_3">
+          <mxGeometry y="174" width="500" height="146" as="geometry" />
         </mxCell>
-        <mxCell id="c_ui_decks_6" value="DeckDetailPage (/deck/:id)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=13;strokeWidth=1.2;" vertex="1" parent="1">
-          <mxGeometry x="555" y="100" width="505" height="320" as="geometry" />
+        <mxCell id="c_ui_decks_6" value="DeckBuilderPage (/deck-builder)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=13;strokeWidth=1.2;" vertex="1" parent="1">
+          <mxGeometry x="560" y="100" width="500" height="320" as="geometry" />
         </mxCell>
-        <mxCell id="c_ui_decks_7" value="Title | Est. Cost | [ Like ] [ Export .ydk ]" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_decks_6">
-          <mxGeometry y="28" width="505" height="146" as="geometry" />
+        <mxCell id="c_ui_decks_7" value="Deck Info Form | Progress KPIs (Main 40-60, Extra &lt;=15)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_decks_6">
+          <mxGeometry y="28" width="500" height="146" as="geometry" />
         </mxCell>
-        <mxCell id="c_ui_decks_8" value="Main Deck / Extra Deck / Side Deck" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_decks_6">
-          <mxGeometry y="174" width="505" height="146" as="geometry" />
+        <mxCell id="c_ui_decks_8" value="Search &amp; Add Cards | My Personal Decks (Save / Edit / Delete)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_decks_6">
+          <mxGeometry y="174" width="500" height="146" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
@@ -115,7 +115,7 @@
         <mxCell id="c_ui_banlist_3" value="Forbidden &amp; Limited List" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=13;strokeWidth=1.2;" vertex="1" parent="1">
           <mxGeometry x="40" y="100" width="1020" height="320" as="geometry" />
         </mxCell>
-        <mxCell id="c_ui_banlist_4" value="Tabs: [ TCG ] [ OCG ] [ Master Duel ] | Effective Month" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_banlist_3">
+        <mxCell id="c_ui_banlist_4" value="Tabs: [ TCG ] [ OCG ] [ Master Duel ] | Select Year &amp; Wave" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_banlist_3">
           <mxGeometry y="28" width="1020" height="146" as="geometry" />
         </mxCell>
         <mxCell id="c_ui_banlist_5" value="Forbidden (0) | Limited (1) | Semi-Limited (2) Grids" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_banlist_3">
@@ -144,7 +144,7 @@
         <mxCell id="c_ui_auth_profile_6" value="ProfilePage (/profile)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=13;strokeWidth=1.2;" vertex="1" parent="1">
           <mxGeometry x="505" y="100" width="555" height="320" as="geometry" />
         </mxCell>
-        <mxCell id="c_ui_auth_profile_7" value="Account Info &amp; Change Password Form" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_auth_profile_6">
+        <mxCell id="c_ui_auth_profile_7" value="Account Info, Change Password &amp; [ Manage My Decks ]" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_auth_profile_6">
           <mxGeometry y="28" width="555" height="146" as="geometry" />
         </mxCell>
         <mxCell id="c_ui_auth_profile_8" value="Favorite Cards Collection Grid" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_auth_profile_6">
@@ -164,13 +164,13 @@
         <mxCell id="c_ui_admin_3" value="Dashboard Stats" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=13;strokeWidth=1.2;" vertex="1" parent="1">
           <mxGeometry x="40" y="100" width="1020" height="95" as="geometry" />
         </mxCell>
-        <mxCell id="c_ui_admin_4" value="Total Cards (252)  |  Total Decks (40)  |  Total Users (17)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_admin_3">
+        <mxCell id="c_ui_admin_4" value="Total Cards (252)  |  Total Decks (40+)  |  Total Users (17+)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_admin_3">
           <mxGeometry y="28" width="1020" height="67" as="geometry" />
         </mxCell>
-        <mxCell id="c_ui_admin_5" value="CRUD Tabs: [ Cards &amp; Prices ] | [ Decks ] | [ Users ]" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=13;strokeWidth=1.2;" vertex="1" parent="1">
+        <mxCell id="c_ui_admin_5" value="CRUD Tabs: [ Cards &amp; Prices ] | [ Users &amp; Roles ]" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=28;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=13;strokeWidth=1.2;" vertex="1" parent="1">
           <mxGeometry x="40" y="215" width="1020" height="205" as="geometry" />
         </mxCell>
-        <mxCell id="c_ui_admin_6" value="+ Add  |  Search  |  Actions: Edit / Override Price / Role / Delete" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_admin_5">
+        <mxCell id="c_ui_admin_6" value="+ Add Card  |  Search  |  Actions: Edit Card / Override Price / Role / Delete User" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;whiteSpace=wrap;html=1;fontSize=12;fontColor=#000000;" vertex="1" parent="c_ui_admin_5">
           <mxGeometry y="28" width="1020" height="177" as="geometry" />
         </mxCell>
       </root>

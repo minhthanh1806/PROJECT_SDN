@@ -561,10 +561,10 @@
         <mxCell id="c_wf_admin_10" value="GET /api/admin/stats&lt;br&gt;&amp; Load Collections" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11.5;strokeWidth=1.15;" vertex="1" parent="c_wf_admin_4">
           <mxGeometry x="414" y="38" width="134" height="56" as="geometry" />
         </mxCell>
-        <mxCell id="c_wf_admin_11" value="Select Cards, Decks&lt;br&gt;or Users Tab" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11.5;strokeWidth=1.15;" vertex="1" parent="c_wf_admin_3">
+        <mxCell id="c_wf_admin_11" value="Select Cards or&lt;br&gt;Users Tab" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11.5;strokeWidth=1.15;" vertex="1" parent="c_wf_admin_3">
           <mxGeometry x="414" y="65" width="134" height="56" as="geometry" />
         </mxCell>
-        <mxCell id="c_wf_admin_12" value="Submit CRUD Form&lt;br&gt;or Price Override" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11.5;strokeWidth=1.15;" vertex="1" parent="c_wf_admin_3">
+        <mxCell id="c_wf_admin_12" value="Submit Card/User Form&lt;br&gt;or Price Override" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11.5;strokeWidth=1.15;" vertex="1" parent="c_wf_admin_3">
           <mxGeometry x="586" y="65" width="136" height="56" as="geometry" />
         </mxCell>
         <mxCell id="c_wf_admin_13" value="Validate Payload &amp;&lt;br&gt;Prepare DB Query" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;fontSize=11.5;strokeWidth=1.15;" vertex="1" parent="c_wf_admin_4">

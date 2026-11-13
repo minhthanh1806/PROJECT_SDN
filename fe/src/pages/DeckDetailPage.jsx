@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { getDeckById, likeDeck, translateCardEffect } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import {
   ArrowLeft,
   Layers,
@@ -15,11 +16,13 @@ import {
   ExternalLink,
   ShieldAlert,
   Languages,
-  RefreshCw
+  RefreshCw,
+  Edit3
 } from 'lucide-react';
 
 export default function DeckDetailPage() {
   const { id } = useParams();
+  const { user } = useAuth();
   const [deck, setDeck] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -262,6 +265,17 @@ export default function DeckDetailPage() {
               </div>
 
               <div className="deck-action-buttons">
+                {user && deck.user_id && String(deck.user_id) === String(user.id || user._id) && (
+                  <Link
+                    to={`/deck-builder?id=${deck._id}`}
+                    className="action-btn-secondary"
+                    style={{ textDecoration: 'none', color: '#3b82f6', borderColor: 'rgba(59, 130, 246, 0.4)' }}
+                    title="Chỉnh sửa bộ bài cá nhân của bạn"
+                  >
+                    <Edit3 size={16} /> Chỉnh sửa Deck
+                  </Link>
+                )}
+
                 <button
                   type="button"
                   onClick={handleDownloadYDK}
