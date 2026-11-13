@@ -271,43 +271,6 @@ export default function BanlistPage() {
         </div>
 
         {/* ============================================================
-            BẢNG THÔNG BÁO CHI TIẾT THÁNG ĐƯỢC CHỌN
-            ============================================================ */}
-        {selectedMonth && (
-          <div style={{ maxWidth: '1100px', margin: '0 auto 1.5rem' }}>
-            <div className="ban-summary-panel">
-              <div>
-                <div className="ban-summary-title">
-                  <span>
-                    Banlist <strong>{formatMonthLabel(selectedMonth)}</strong>
-                    {currentMonthSummary?.dates?.[0] && (
-                      <span style={{ fontWeight: 500, fontSize: '0.95rem', marginLeft: 8, color: 'var(--text-secondary)' }}>
-                        (Ngày hiệu lực: {formatShortDate(currentMonthSummary.dates[0])})
-                      </span>
-                    )}
-                  </span>
-                </div>
-                <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                  Tổng cộng <strong>{data.stats.totalCount} lá bài</strong> nằm trong danh sách cấm & giới hạn của đợt này:
-                </div>
-              </div>
-
-              <div className="ban-chips-row">
-                <span className="ban-chip chip-forbidden">
-                  Bị cấm: <strong>{data.stats.forbiddenCount}</strong> lá
-                </span>
-                <span className="ban-chip chip-limited">
-                  Giới hạn 1: <strong>{data.stats.limitedCount}</strong> lá
-                </span>
-                <span className="ban-chip chip-semi">
-                  Giới hạn 2: <strong>{data.stats.semiLimitedCount}</strong> lá
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================
             THANH CÔNG CỤ: TAB LỌC TRẠNG THÁI & CHẾ ĐỘ HIỂN THỊ
             ============================================================ */}
         <div
