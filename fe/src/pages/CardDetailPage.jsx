@@ -270,7 +270,7 @@ export default function CardDetailPage() {
                   <span>Hiệu ứng / Mô tả lá bài:</span>
                 </div>
 
-                {/* NÚT CHUYỂN ĐỔI NGÔN NGỮ TIẾNG VIỆT / TIẾNG ANH */}
+                {/* Chuyển đổi ngôn ngữ Tiếng Việt / Tiếng Anh */}
                 <div className="lang-toggle-group">
                   <button
                     type="button"
@@ -278,7 +278,7 @@ export default function CardDetailPage() {
                     className={`lang-btn ${!isVietnamese ? 'active' : ''}`}
                     title="Xem bản gốc Tiếng Anh chuẩn TCG"
                   >
-                    <span>🇬🇧 English</span>
+                    <span>English</span>
                   </button>
                   <button
                     type="button"
@@ -292,7 +292,7 @@ export default function CardDetailPage() {
                         <RefreshCw size={12} className="spin" /> Đang dịch...
                       </span>
                     ) : (
-                      <span>🇻🇳 Tiếng Việt</span>
+                      <span>Tiếng Việt</span>
                     )}
                   </button>
                 </div>

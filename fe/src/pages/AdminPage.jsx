@@ -30,7 +30,9 @@ import {
   RefreshCw,
   Trophy,
   Flame,
-  ArrowUpRight,
+  TrendingUp,
+  Heart,
+  Star,
   X
 } from 'lucide-react';
 
@@ -344,15 +346,12 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ADMIN HEADER */}
+        {/* Header quản trị */}
         <div className="admin-hero-header">
           <div className="admin-hero-left">
-            <div className="admin-badge-pill">
-              <ShieldCheck size={16} /> Bảng Điều Khiển Quản Trị Hệ Thống
-            </div>
-            <h1 className="admin-hero-title">Yu-Gi-Oh! Admin Hub</h1>
+            <h1 className="admin-hero-title">Quản Trị Hệ Thống</h1>
             <p className="admin-hero-subtitle">
-              Quản lý toàn diện cơ sở dữ liệu Decks, định giá thẻ bài thị trường và danh sách tài khoản người dùng.
+              Quản lý danh mục thẻ bài, cập nhật giá thị trường và phân quyền tài khoản người dùng.
             </p>
           </div>
 
@@ -397,9 +396,7 @@ export default function AdminPage() {
           </button>
         </div>
 
-        {/* ======================================================== */}
-        {/* TAB 1: OVERVIEW & DASHBOARD STATS */}
-        {/* ======================================================== */}
+        {/* Tab 1: Thống kê tổng quan */}
         {activeTab === 'overview' && (
           <div>
             {statsLoading || !stats ? (
@@ -560,9 +557,7 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ======================================================== */}
-        {/* TAB 2: QUẢN LÝ THẺ BÀI & GIÁ */}
-        {/* ======================================================== */}
+        {/* Tab 2: Quản lý thẻ bài và giá */}
         {activeTab === 'cards' && (
           <div className="admin-section-wrap">
             <div className="admin-toolbar-row">
@@ -632,7 +627,7 @@ export default function AdminPage() {
                           </td>
                           <td><span className="card-type-tag">{c.type}</span></td>
                           <td>
-                            {c.level !== undefined && <span>⭐ {c.level} </span>}
+                            {c.level !== undefined && <span>Lv.{c.level} </span>}
                             {c.attribute && <strong>{c.attribute}</strong>}
                           </td>
                           <td>
@@ -709,9 +704,7 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ======================================================== */}
-        {/* TAB 4: QUẢN LÝ NGƯỜI DÙNG */}
-        {/* ======================================================== */}
+        {/* Tab 3: Quản lý người dùng */}
         {activeTab === 'users' && (
           <div className="admin-section-wrap">
             <div className="admin-toolbar-row">
@@ -817,9 +810,7 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ======================================================== */}
-        {/* MODAL THÊM / SỬA LÁ BÀI (CARD) */}
-        {/* ======================================================== */}
+        {/* Modal thêm / sửa lá bài */}
         {cardModalOpen && (
           <div className="admin-modal-overlay">
             <div className="admin-modal-card modal-lg">

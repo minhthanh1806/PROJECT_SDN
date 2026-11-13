@@ -17,7 +17,6 @@ import {
   Trash2,
   Save,
   Download,
-  Sparkles,
   Zap,
   CheckCircle,
   AlertCircle,
@@ -25,11 +24,9 @@ import {
   Shield,
   Eye,
   Edit3,
-  Wand2,
   X
 } from 'lucide-react';
 
-// Style chuẩn đồng bộ cho tất cả Input / Select / Textarea trên trang Deck Builder
 const FIELD_LABEL_STYLE = {
   display: 'block',
   fontSize: '0.82rem',
@@ -440,9 +437,7 @@ export default function DeckBuilderPage() {
       )}
 
       <main className="container" style={{ padding: '1.75rem 1.25rem 4rem' }}>
-        {/* ============================================================
-            BANNER HEADER TRANG DECK BUILDER
-            ============================================================ */}
+        {/* Header */}
         <div
           style={{
             maxWidth: '1240px',
@@ -460,25 +455,8 @@ export default function DeckBuilderPage() {
           }}
         >
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.45rem' }}>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  padding: '0.28rem 0.75rem',
-                  borderRadius: '999px',
-                  fontSize: '0.78rem',
-                  fontWeight: 700,
-                  backgroundColor: 'rgba(245, 158, 11, 0.12)',
-                  color: '#d97706',
-                  border: '1px solid rgba(245, 158, 11, 0.3)'
-                }}
-              >
-                <Sparkles size={13} color="#f59e0b" /> Trình Tạo Bộ Bài Cá Nhân
-              </span>
-
-              {deckId && (
+            {deckId && (
+              <div style={{ marginBottom: '0.45rem' }}>
                 <span
                   style={{
                     fontSize: '0.78rem',
@@ -490,20 +468,19 @@ export default function DeckBuilderPage() {
                     border: '1px solid rgba(59, 130, 246, 0.25)'
                   }}
                 >
-                  Đang chỉnh sửa Deck
+                  Chế độ chỉnh sửa
                 </span>
-              )}
-            </div>
+              </div>
+            )}
 
             <h1 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '0 0 0.3rem', letterSpacing: '-0.02em' }}>
-              {deckId ? `Chỉnh Sửa: ${name || 'Bộ Bài Cá Nhân'}` : 'Yu-Gi-Oh! Deck Builder'}
+              {deckId ? `Chỉnh sửa: ${name || 'Bộ bài cá nhân'}` : 'Tạo Bộ Bài (Deck Builder)'}
             </h1>
             <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '0.92rem' }}>
-              Xây dựng chiến thuật cá nhân theo chuẩn thi đấu Konami: Main Deck (40–60 lá), Extra Deck (≤ 15 lá), Side Deck (≤ 15 lá).
+              Xây dựng bộ bài theo chuẩn thi đấu: Main Deck (40–60 lá), Extra Deck (0–15 lá), Side Deck (0–15 lá).
             </p>
           </div>
 
-          {/* CỤM 3 NÚT HÀNH ĐỘNG ĐỒNG BỘ, BO GÓC HIỆN ĐẠI */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
             <button
               type="button"
@@ -575,9 +552,7 @@ export default function DeckBuilderPage() {
           </div>
         </div>
 
-        {/* ============================================================
-            4 THẺ CHỈ SỐ TIẾN ĐỘ (KPI CARDS KÈM PROGRESS BAR)
-            ============================================================ */}
+        {/* Thống kê số lượng thẻ và giá trị */}
         <div style={{ maxWidth: '1240px', margin: '0 auto 1.5rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
             {/* Main Deck KPI */}
@@ -686,9 +661,7 @@ export default function DeckBuilderPage() {
           </div>
         </div>
 
-        {/* ============================================================
-            BỐ CỤC CHÍNH 2 CỘT: TRÁI (BUILDER) - PHẢI (TÌM THẺ & MY DECKS)
-            ============================================================ */}
+        {/* Bố cục 2 cột */}
         <div
           style={{
             maxWidth: '1240px',
@@ -699,9 +672,8 @@ export default function DeckBuilderPage() {
             alignItems: 'start'
           }}
         >
-          {/* CỘT TRÁI: THÔNG TIN BỘ BÀI + LƯỚI THẺ BÀI */}
+          {/* Cột trái: Thông tin bộ bài và danh sách thẻ */}
           <div>
-            {/* KHUNG THÔNG TIN BỘ BÀI (ĐỒNG BỘ INPUT & SELECT) */}
             <div
               style={{
                 background: 'var(--bg-card)',
@@ -915,7 +887,7 @@ export default function DeckBuilderPage() {
                     Chưa có lá bài nào trong {activeSection.toUpperCase()} Deck
                   </div>
                   <p style={{ fontSize: '0.88rem', maxWidth: '420px', margin: '0 auto 1.25rem' }}>
-                    Hãy bấm nút <strong>&quot;+ Thêm&quot;</strong> ở danh sách thẻ bài cột bên phải để đưa lá bài vào bộ bài của bạn.
+                    Chọn thẻ bài từ danh sách bên phải để thêm vào bộ bài.
                   </p>
                 </div>
               ) : (
@@ -1080,11 +1052,9 @@ export default function DeckBuilderPage() {
             </div>
           </div>
 
-          {/* ============================================================
-              CỘT PHẢI: TÌM & THÊM THẺ BÀI + DANH SÁCH DECK CỦA TÔI
-              ============================================================ */}
+          {/* Cột phải: Tìm thẻ bài và danh sách Deck cá nhân */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: '80px' }}>
-            {/* KHUNG TÌM & THÊM THẺ BÀI */}
+            {/* Khung tìm và thêm thẻ bài */}
             <div
               style={{
                 background: 'var(--bg-card)',
@@ -1118,7 +1088,7 @@ export default function DeckBuilderPage() {
                       gap: '3px'
                     }}
                   >
-                    <Wand2 size={12} /> Lọc {archetype.trim()}
+                    Lọc {archetype.trim()}
                   </button>
                 )}
               </div>
@@ -1341,7 +1311,7 @@ export default function DeckBuilderPage() {
                     background: 'var(--bg-primary)'
                   }}
                 >
-                  Bạn chưa lưu bộ bài nào. Hãy thêm đủ 40 lá Main Deck và bấm <strong>&quot;Lưu Bộ Bài&quot;</strong> nhé!
+                  Chưa có bộ bài nào được lưu.
                 </div>
               ) : (
                 <div style={{ maxHeight: '280px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>

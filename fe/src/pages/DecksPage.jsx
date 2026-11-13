@@ -20,7 +20,7 @@ import {
 export default function DecksPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Đọc trực tiếp các giá trị bộ lọc từ URL (Single source of truth, chống loop re-render)
+  // Lấy giá trị bộ lọc từ URL
   const searchTerm = searchParams.get('q') || '';
   const selectedCategory = searchParams.get('category') || '';
   const selectedFormat = searchParams.get('format') || '';
@@ -147,18 +147,15 @@ export default function DecksPage() {
       <Navbar />
 
       <main className="container" style={{ padding: '2rem 1.25rem 3.5rem' }}>
-        {/* BANNER HEADER TRANG DECKS */}
+        {/* Header trang Decks */}
         <div className="decks-hero-banner">
           <div className="decks-hero-content">
-            <span className="decks-badge-pill">
-              <Sparkles size={14} color="#f59e0b" /> Thư viện Decks Yu-Gi-Oh!
-            </span>
-            <h1 className="decks-hero-title">Khám Phá &amp; Tìm Kiếm Decks</h1>
+            <h1 className="decks-hero-title">Thư Viện Decks Yu-Gi-Oh!</h1>
             <p className="decks-hero-subtitle">
-              Tra cứu hàng loạt chiến thuật Meta, Tournament Decks, Top Archetypes và Master Duel. Xem đầy đủ danh sách lá bài và bảng giá thị trường mới nhất.
+              Tra cứu các bộ bài theo Format TCG, OCG, Master Duel kèm danh sách thẻ bài và ước tính giá thị trường.
             </p>
 
-            {/* THANH TÌM KIẾM CHÍNH */}
+            {/* Thanh tìm kiếm */}
             <div className="decks-search-bar-wrap">
               <div className="decks-search-input-box">
                 <Search size={18} className="search-icon" />

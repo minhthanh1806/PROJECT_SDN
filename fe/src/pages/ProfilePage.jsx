@@ -243,9 +243,9 @@ export default function ProfilePage() {
             ) : (
               <div className="empty-container" style={{ backgroundColor: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
                 <h3>Chưa có thẻ nào trong bộ sưu tập</h3>
-                <p>Hãy bấm vào nút ngôi sao trên góc mỗi thẻ bài tại Trang chủ để lưu lại nhé!</p>
+                <p>Nhấn vào biểu tượng ngôi sao trên mỗi thẻ bài tại Trang chủ để lưu vào bộ sưu tập.</p>
                 <Link to="/" className="auth-submit" style={{ textDecoration: 'none', display: 'inline-block', marginTop: '0.75rem', padding: '0.6rem 1.25rem' }}>
-                  Khám phá thẻ bài ngay
+                  Xem danh sách thẻ bài
                 </Link>
               </div>
             )}

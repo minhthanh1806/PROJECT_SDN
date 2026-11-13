@@ -2,7 +2,7 @@ const Card = require('../models/Card');
 const Deck = require('../models/Deck');
 const User = require('../models/User');
 
-// 1. Thống kê tổng quan hệ thống (KPIs, Charts, Top Decks)
+// Thống kê tổng quan hệ thống
 exports.getOverviewStats = async (req, res) => {
   try {
     const [totalCards, totalDecks, totalUsers, formatAgg, categoryAgg, topDecks, recentUsers] = await Promise.all([
@@ -54,7 +54,7 @@ exports.getOverviewStats = async (req, res) => {
   }
 };
 
-// 2. Quản lý danh sách Thẻ bài & Giá
+// Lấy danh sách thẻ bài (phân trang, tìm kiếm)
 exports.getAdminCards = async (req, res) => {
   try {
     const { q, type, page = 1, limit = 20 } = req.query;
@@ -101,7 +101,7 @@ exports.getAdminCards = async (req, res) => {
   }
 };
 
-// 7. Cập nhật giá thẻ bài
+// Cập nhật giá thẻ bài
 exports.updateCardPrice = async (req, res) => {
   try {
     const { id } = req.params; // card id (number)
@@ -137,7 +137,7 @@ exports.updateCardPrice = async (req, res) => {
   }
 };
 
-// 7.1 Thêm mới lá bài (Create Card)
+// Thêm mới lá bài
 exports.createAdminCard = async (req, res) => {
   try {
     const {
@@ -246,7 +246,7 @@ exports.createAdminCard = async (req, res) => {
   }
 };
 
-// 7.2 Cập nhật toàn diện thông tin thẻ bài
+// Cập nhật thông tin thẻ bài
 exports.updateAdminCard = async (req, res) => {
   try {
     const { id } = req.params;
@@ -315,7 +315,7 @@ exports.updateAdminCard = async (req, res) => {
   }
 };
 
-// 7.3 Xóa thẻ bài khỏi cơ sở dữ liệu
+// Xóa thẻ bài
 exports.deleteAdminCard = async (req, res) => {
   try {
     const { id } = req.params;
@@ -334,7 +334,7 @@ exports.deleteAdminCard = async (req, res) => {
   }
 };
 
-// 8. Quản lý danh sách Tài khoản Người dùng
+// Lấy danh sách tài khoản người dùng
 exports.getAdminUsers = async (req, res) => {
   try {
     const { q, role, page = 1, limit = 20 } = req.query;
@@ -384,7 +384,7 @@ exports.getAdminUsers = async (req, res) => {
   }
 };
 
-// 9. Đổi Role người dùng (user <-> admin)
+// Đổi quyền người dùng (user / admin)
 exports.updateUserRole = async (req, res) => {
   try {
     const { id } = req.params;
@@ -413,7 +413,7 @@ exports.updateUserRole = async (req, res) => {
   }
 };
 
-// 10. Xóa người dùng
+// Xóa tài khoản người dùng
 exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.params;

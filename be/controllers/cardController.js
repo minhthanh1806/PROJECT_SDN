@@ -156,11 +156,11 @@ exports.getCardById = async (req, res) => {
   }
 };
 
-// Hàm hỗ trợ dịch văn bản sang tiếng Việt đa tầng (Multi-tier translation pipeline)
+// Dịch văn bản tiếng Anh sang tiếng Việt
 async function translateToVietnamese(text) {
   if (!text || !text.trim()) return '';
 
-  // 1. Thử Provider 1: clients5.google.com (nhanh, hỗ trợ đa dòng, không bị chặn)
+  // Thử Google Translate endpoint 1
   try {
     const url = `https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=en&tl=vi&q=${encodeURIComponent(text)}`;
     const response = await axios.get(url, {
@@ -278,10 +278,8 @@ exports.translateCardEffect = async (req, res) => {
       });
     }
 
-    // Thực hiện dịch qua pipeline đa tầng
     const translated = await translateToVietnamese(card.desc);
 
-    // Lưu vào database để lần sau lấy ngay lập tức
     if (translated && translated.trim()) {
       card.desc_vi = translated;
       await card.save();

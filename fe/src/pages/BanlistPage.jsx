@@ -136,12 +136,6 @@ export default function BanlistPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Lấy thông tin chi tiết của tháng đang chọn
-  const currentMonthSummary = useMemo(() => {
-    if (!selectedMonth || !data.monthSummaries) return null;
-    return data.monthSummaries.find((m) => m.month === selectedMonth);
-  }, [selectedMonth, data.monthSummaries]);
-
   return (
     <div className="app-shell">
       <Navbar />
@@ -192,9 +186,7 @@ export default function BanlistPage() {
           </div>
         </div>
 
-        {/* ============================================================
-            BỘ LỌC CHỌN BANLIST THEO NĂM & ĐỢT THÁNG (2022 - 2026)
-            ============================================================ */}
+        {/* Bộ lọc chọn Banlist theo năm và đợt tháng */}
         <div style={{ maxWidth: '1100px', margin: '0 auto 1.75rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '1.25rem' }}>
             {/* Select Năm cập nhật */}
@@ -270,9 +262,7 @@ export default function BanlistPage() {
           </div>
         </div>
 
-        {/* ============================================================
-            THANH CÔNG CỤ: TAB LỌC TRẠNG THÁI & CHẾ ĐỘ HIỂN THỊ
-            ============================================================ */}
+        {/* Thanh lọc trạng thái và chế độ hiển thị */}
         <div
           style={{
             maxWidth: '1100px',
@@ -393,9 +383,7 @@ export default function BanlistPage() {
           </span>
         </div>
 
-        {/* ============================================================
-            HIỂN THỊ DANH SÁCH THẺ (DẠNG LƯỚI HOẶC BẢNG DANH SÁCH)
-            ============================================================ */}
+        {/* Danh sách thẻ bài */}
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           {viewMode === 'grid' ? (
             <CardGrid cards={paginatedCards} loading={loading} />

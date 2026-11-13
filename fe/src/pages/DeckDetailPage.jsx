@@ -378,7 +378,7 @@ export default function DeckDetailPage() {
                           className={`preview-lang-btn ${previewLang === 'vi' ? 'active' : ''}`}
                           title="Xem bản dịch Tiếng Việt"
                         >
-                          {previewTranslating ? '...' : '🇻🇳 VI'}
+                          {previewTranslating ? '...' : 'VI'}
                         </button>
                         <button
                           type="button"
@@ -386,7 +386,7 @@ export default function DeckDetailPage() {
                           className={`preview-lang-btn ${previewLang === 'en' ? 'active' : ''}`}
                           title="Xem bản gốc Tiếng Anh"
                         >
-                          🇬🇧 EN
+                          EN
                         </button>
                       </div>
                     </div>
@@ -441,10 +441,10 @@ export default function DeckDetailPage() {
                     Bộ bài này chưa có lá bài nào trong Main Deck
                   </div>
                   <div style={{ fontSize: '0.88rem', maxWidth: '420px', margin: '0 auto 1.25rem' }}>
-                    Bộ bài vừa được tạo mới hoặc chưa cập nhật danh sách thẻ bài. Bạn có thể thêm thẻ bằng cách chỉnh sửa bộ bài trong trang Quản Trị.
+                    Bộ bài vừa được tạo mới hoặc chưa cập nhật danh sách thẻ bài.
                   </div>
-                  <Link to="/admin" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
-                    Đi đến trang Quản Trị (Admin)
+                  <Link to={`/deck-builder?id=${deck._id}`} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
+                    Chỉnh sửa trong Deck Builder
                   </Link>
                 </div>
               )}

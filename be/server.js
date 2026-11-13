@@ -14,19 +14,16 @@ const { syncCardData } = require('./scripts/syncCards');
 
 const app = express();
 
-// 1. Kết nối MongoDB
 connectDB();
 
-// 2. Middlewares
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 3. Phục vụ ảnh thẻ tự host (có fallback on-demand tự động tải và cache nếu chưa có)
+// Phục vụ ảnh thẻ bài từ thư mục public (hoặc tải tự động nếu chưa có)
 app.use('/images/cards', express.static(path.join(__dirname, 'public/images/cards')));
 app.get('/images/cards/:filename', serveCardImage);
 
-// 4. API Routes
 app.use('/api/cards', cardRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/decks', deckRoutes);
