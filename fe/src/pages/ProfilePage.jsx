@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import CardGrid from '../components/CardGrid';
 import { getUserProfile, changePassword } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { formatVND } from '../utils/currency';
 import { User, Calendar, Key, Star, DollarSign, Layers } from 'lucide-react';
 
 export default function ProfilePage() {
@@ -196,7 +197,10 @@ export default function ProfilePage() {
                 <div>
                   <div className="stat-label">Ước tính giá trị thị trường</div>
                   <div className="stat-number" style={{ color: '#10b981' }}>
-                    ${profileData?.stats?.totalValue?.toFixed(2) || '0.00'}
+                    ${profileData?.stats?.totalValue?.toFixed(2) || '0.00'}{' '}
+                    <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                      (~{formatVND(profileData?.stats?.totalValue || 0)})
+                    </span>
                   </div>
                 </div>
               </div>

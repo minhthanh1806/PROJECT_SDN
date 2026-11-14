@@ -5,6 +5,7 @@ import SearchBar from '../components/SearchBar';
 import CardGrid from '../components/CardGrid';
 import Pagination from '../components/Pagination';
 import { getSampleBannedCards } from '../services/api';
+import { formatVND } from '../utils/currency';
 
 const CARDS_PER_PAGE = 12;
 
@@ -493,9 +494,14 @@ export default function BanlistPage() {
                           </td>
                           <td style={{ textAlign: 'right' }}>
                             {card.min_price > 0 ? (
-                              <span style={{ fontWeight: 700, color: 'var(--success)' }}>
-                                ${card.min_price.toFixed(2)}
-                              </span>
+                              <div>
+                                <span style={{ fontWeight: 700, color: 'var(--success)' }}>
+                                  ${card.min_price.toFixed(2)}
+                                </span>
+                                <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
+                                  ~{formatVND(card.min_price)}
+                                </div>
+                              </div>
                             ) : (
                               <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                                 Chưa có giá

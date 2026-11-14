@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { formatVND } from '../utils/currency';
 
 export default function CardItem({ card, onFavoriteChange }) {
   const [imgSrc, setImgSrc] = useState(
@@ -105,9 +106,16 @@ export default function CardItem({ card, onFavoriteChange }) {
           {/* Lowest Price */}
           <div className="card-price-bottom">
             <span className="price-label">Giá thấp nhất:</span>
-            <span className={`price-value ${minPrice > 0 ? '' : 'is-na'}`}>
-              {minPrice > 0 ? `$${minPrice.toFixed(2)}` : 'Chưa có giá'}
-            </span>
+            {minPrice > 0 ? (
+              <div style={{ textAlign: 'right', lineHeight: 1.25 }}>
+                <span className="price-value">${minPrice.toFixed(2)}</span>
+                <div style={{ fontSize: '0.73rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+                  ~{formatVND(minPrice)}
+                </div>
+              </div>
+            ) : (
+              <span className="price-value is-na">Chưa có giá</span>
+            )}
           </div>
         </div>
       </Link>

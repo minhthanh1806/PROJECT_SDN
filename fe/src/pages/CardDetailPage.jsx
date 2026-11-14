@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { getCardById, translateCardEffect } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { formatVND, formatEurToVND } from '../utils/currency';
 import {
   ArrowLeft,
   Star,
@@ -345,6 +346,11 @@ export default function CardDetailPage() {
                   <div className={`price-tag-amount ${!prices.cardmarket_price || Number(prices.cardmarket_price) <= 0 ? 'is-na' : ''}`}>
                     {prices.cardmarket_price && Number(prices.cardmarket_price) > 0 ? `€${Number(prices.cardmarket_price).toFixed(2)}` : 'Chưa có hàng'}
                   </div>
+                  {prices.cardmarket_price && Number(prices.cardmarket_price) > 0 && (
+                    <div style={{ fontSize: '0.76rem', fontWeight: 700, color: '#10b981', marginTop: '2px' }}>
+                      ~{formatEurToVND(prices.cardmarket_price)}
+                    </div>
+                  )}
                   <div className="price-region">Châu Âu (Euro)</div>
                 </div>
 
@@ -354,6 +360,11 @@ export default function CardDetailPage() {
                   <div className={`price-tag-amount ${!prices.tcgplayer_price || Number(prices.tcgplayer_price) <= 0 ? 'is-na' : ''}`}>
                     {prices.tcgplayer_price && Number(prices.tcgplayer_price) > 0 ? `$${Number(prices.tcgplayer_price).toFixed(2)}` : 'Chưa có hàng'}
                   </div>
+                  {prices.tcgplayer_price && Number(prices.tcgplayer_price) > 0 && (
+                    <div style={{ fontSize: '0.76rem', fontWeight: 700, color: '#10b981', marginTop: '2px' }}>
+                      ~{formatVND(prices.tcgplayer_price)}
+                    </div>
+                  )}
                   <div className="price-region">Bắc Mỹ (USD)</div>
                 </div>
 
@@ -363,6 +374,11 @@ export default function CardDetailPage() {
                   <div className={`price-tag-amount ${!prices.ebay_price || Number(prices.ebay_price) <= 0 ? 'is-na' : ''}`}>
                     {prices.ebay_price && Number(prices.ebay_price) > 0 ? `$${Number(prices.ebay_price).toFixed(2)}` : 'Chưa có hàng'}
                   </div>
+                  {prices.ebay_price && Number(prices.ebay_price) > 0 && (
+                    <div style={{ fontSize: '0.76rem', fontWeight: 700, color: '#10b981', marginTop: '2px' }}>
+                      ~{formatVND(prices.ebay_price)}
+                    </div>
+                  )}
                   <div className="price-region">Quốc tế (USD)</div>
                 </div>
 
@@ -372,6 +388,11 @@ export default function CardDetailPage() {
                   <div className={`price-tag-amount ${!prices.amazon_price || Number(prices.amazon_price) <= 0 ? 'is-na' : ''}`}>
                     {prices.amazon_price && Number(prices.amazon_price) > 0 ? `$${Number(prices.amazon_price).toFixed(2)}` : 'Chưa có hàng'}
                   </div>
+                  {prices.amazon_price && Number(prices.amazon_price) > 0 && (
+                    <div style={{ fontSize: '0.76rem', fontWeight: 700, color: '#10b981', marginTop: '2px' }}>
+                      ~{formatVND(prices.amazon_price)}
+                    </div>
+                  )}
                   <div className="price-region">Quốc tế (USD)</div>
                 </div>
 
@@ -381,6 +402,11 @@ export default function CardDetailPage() {
                   <div className={`price-tag-amount ${!prices.coolstuffinc_price || Number(prices.coolstuffinc_price) <= 0 ? 'is-na' : ''}`}>
                     {prices.coolstuffinc_price && Number(prices.coolstuffinc_price) > 0 ? `$${Number(prices.coolstuffinc_price).toFixed(2)}` : 'Chưa có hàng'}
                   </div>
+                  {prices.coolstuffinc_price && Number(prices.coolstuffinc_price) > 0 && (
+                    <div style={{ fontSize: '0.76rem', fontWeight: 700, color: '#10b981', marginTop: '2px' }}>
+                      ~{formatVND(prices.coolstuffinc_price)}
+                    </div>
+                  )}
                   <div className="price-region">Bắc Mỹ (USD)</div>
                 </div>
               </div>
@@ -416,16 +442,23 @@ export default function CardDetailPage() {
                               <td>{s.set_rarity} {s.set_rarity_code || ''}</td>
                               <td style={{ textAlign: 'right' }}>
                                 {hasSetPrice ? (
-                                  <span style={{ fontWeight: 700, color: 'var(--success)' }}>
-                                    ${setPriceNum.toFixed(2)}
-                                  </span>
+                                  <div>
+                                    <span style={{ fontWeight: 700, color: 'var(--success)' }}>
+                                      ${setPriceNum.toFixed(2)}
+                                    </span>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                      ~{formatVND(setPriceNum)}
+                                    </div>
+                                  </div>
                                 ) : fallbackPrice ? (
-                                  <span
-                                    style={{ fontWeight: 700, color: '#0ea5e9' }}
-                                    title="Giá ước tính theo giá thị trường thấp nhất của lá bài này"
-                                  >
-                                    ~${fallbackPrice.toFixed(2)}
-                                  </span>
+                                  <div title="Giá ước tính theo giá thị trường thấp nhất của lá bài này">
+                                    <span style={{ fontWeight: 700, color: '#0ea5e9' }}>
+                                      ~${fallbackPrice.toFixed(2)}
+                                    </span>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                      ~{formatVND(fallbackPrice)}
+                                    </div>
+                                  </div>
                                 ) : (
                                   <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                                     Chưa có giá

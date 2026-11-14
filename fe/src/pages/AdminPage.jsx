@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Pagination from '../components/Pagination';
 import { useAuth } from '../context/AuthContext';
+import { formatVND } from '../utils/currency';
 import {
   getAdminStats,
   getAdminCards,
@@ -657,9 +658,14 @@ export default function AdminPage() {
                                 </button>
                               </div>
                             ) : (
-                              <span style={{ fontWeight: 700, color: 'var(--success)' }}>
-                                ${Number(c.min_price || 0).toFixed(2)}
-                              </span>
+                              <div>
+                                <span style={{ fontWeight: 700, color: 'var(--success)' }}>
+                                  ${Number(c.min_price || 0).toFixed(2)}
+                                </span>
+                                <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
+                                  ~{formatVND(c.min_price)}
+                                </div>
+                              </div>
                             )}
                           </td>
                           <td>

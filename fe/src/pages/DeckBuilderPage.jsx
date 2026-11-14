@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
+import { formatVND } from '../utils/currency';
 import {
   getCards,
   getDeckById,
@@ -650,12 +651,12 @@ export default function DeckBuilderPage() {
                 <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#10b981' }}>
                   ${totalPrice.toFixed(2)}
                 </span>
-                <span style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>
-                  ({mainCount + extraCount + sideCount} lá bài)
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#10b981' }}>
+                  (~{formatVND(totalPrice)})
                 </span>
               </div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                Tính theo giá thấp nhất từ 5 chợ quốc tế
+                Tổng {mainCount + extraCount + sideCount} lá • Tính theo giá thấp nhất
               </div>
             </div>
           </div>
@@ -966,7 +967,7 @@ export default function DeckBuilderPage() {
                         {card.name}
                       </Link>
                       <div style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: 700, marginBottom: '0.45rem' }}>
-                        ${Number(card.price || 0).toFixed(2)}
+                        ${Number(card.price || 0).toFixed(2)} <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>(~{formatVND(card.price)})</span>
                       </div>
 
                       {/* Thanh điều khiển số lượng (- / + / Xóa) */}
@@ -1231,7 +1232,7 @@ export default function DeckBuilderPage() {
                             {c.name}
                           </div>
                           <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                            <strong style={{ color: '#10b981' }}>${Number(c.min_price || 0).toFixed(2)}</strong> • {c.type}
+                            <strong style={{ color: '#10b981' }}>${Number(c.min_price || 0).toFixed(2)} (~{formatVND(c.min_price)})</strong> • {c.type}
                           </div>
                         </div>
                       </div>
@@ -1350,7 +1351,7 @@ export default function DeckBuilderPage() {
                           <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
                             <span style={{ fontWeight: 700, color: '#3b82f6' }}>{d.format}</span> •{' '}
                             {d.stats?.main_count || 0}M / {d.stats?.extra_count || 0}E •{' '}
-                            <strong style={{ color: '#10b981' }}>${Number(d.stats?.total_price || 0).toFixed(2)}</strong>
+                            <strong style={{ color: '#10b981' }}>${Number(d.stats?.total_price || 0).toFixed(2)} (~{formatVND(d.stats?.total_price)})</strong>
                           </div>
                         </div>
 

@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { getDeckById, likeDeck, translateCardEffect } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { formatVND } from '../utils/currency';
 import {
   ArrowLeft,
   Layers,
@@ -259,6 +260,9 @@ export default function DeckDetailPage() {
                 <div className="price-box-amount">
                   ${Number(displayPrice).toFixed(2)}
                 </div>
+                <div style={{ fontSize: '0.92rem', fontWeight: 700, color: '#10b981', marginBottom: '0.2rem' }}>
+                  ≈ {formatVND(displayPrice)}
+                </div>
                 <div className="price-box-note">
                   Tổng {totalCardsCount} lá bài
                 </div>
@@ -362,7 +366,7 @@ export default function DeckDetailPage() {
                 <div className="preview-card-meta">
                   <span>{selectedCard.card_type}</span>
                   <span className={`preview-price-tag ${selectedCard.price > 0 ? '' : 'is-na'}`}>
-                    {selectedCard.price > 0 ? `$${selectedCard.price.toFixed(2)}` : 'Chưa có giá'}
+                    {selectedCard.price > 0 ? `$${selectedCard.price.toFixed(2)} (~${formatVND(selectedCard.price)})` : 'Chưa có giá'}
                   </span>
                 </div>
 
@@ -572,7 +576,7 @@ function DeckCardThumbnail({ card, deckFormat = 'TCG', isSelected, onSelect }) {
       className={`deck-thumb-box ${isSelected ? 'selected' : ''}`}
       onClick={onSelect}
       onMouseEnter={onSelect}
-      title={`${card.name} (${card.quantity}x)${banStatus ? ` [${banStatus} - ${deckFormat}]` : ''} - $${(card.price * card.quantity).toFixed(2)}`}
+      title={`${card.name} (${card.quantity}x)${banStatus ? ` [${banStatus} - ${deckFormat}]` : ''} - $${(card.price * card.quantity).toFixed(2)} (~${formatVND(card.price * card.quantity)})`}
     >
       <img
         src={thumbUrl}

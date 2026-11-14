@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Pagination from '../components/Pagination';
 import { getDecks, getDeckMeta } from '../services/api';
+import { formatVND } from '../utils/currency';
 import {
   Search,
   Layers,
@@ -287,10 +288,10 @@ export default function DecksPage() {
                   className="filter-select-inline"
                 >
                   <option value="">Mọi mức giá</option>
-                  <option value="20">Dưới $20 (Siêu rẻ / Budget)</option>
-                  <option value="35">Dưới $35</option>
-                  <option value="50">Dưới $50</option>
-                  <option value="100">Dưới $100</option>
+                  <option value="20">Dưới $20 (~510.000₫ - Budget)</option>
+                  <option value="35">Dưới $35 (~890.000₫)</option>
+                  <option value="50">Dưới $50 (~1.275.000₫)</option>
+                  <option value="100">Dưới $100 (~2.550.000₫)</option>
                 </select>
               </div>
             </div>
@@ -390,9 +391,9 @@ export default function DecksPage() {
                       <div className="deck-format-badge">
                         {deck.format}
                       </div>
-                      <div className="deck-price-tag">
+                      <div className="deck-price-tag" title={`Khoảng ${formatVND(deck.stats?.total_price || 0)}`}>
                         <DollarSign size={13} style={{ display: 'inline', verticalAlign: '-1px' }} />
-                        {Number(deck.stats?.total_price || 0).toFixed(2)}
+                        {Number(deck.stats?.total_price || 0).toFixed(2)} • ~{formatVND(deck.stats?.total_price || 0)}
                       </div>
                     </div>
                   </Link>
